@@ -22,6 +22,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-builtin-macro-
 
 set(LIB_SRC
     sylar/log.cc
+    sylar/mutex.cc
 )
 
 add_library(sylar SHARED ${LIB_SRC})

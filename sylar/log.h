@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-25 22:53:56
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-26 23:35:29
+ * @LastEditTime: 2024-11-29 20:28:25
  * @FilePath: /MySylar/sylar/log.h
  */
 
@@ -18,10 +18,13 @@
 
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "mutex.h"
 
 namespace sylar {
 
@@ -89,63 +92,86 @@ public:
      * @param[in] time UTC时间
      * @param[in] thread_name 线程名称
      */
-    LogEvent(const std::string& logger_name, LogLevel::Level level, const char* file, int32_t line, int64_t elapse, uint32_t thread_id,
-             uint64_t fiber_id, time_t time, const std::string& thread_name);
+    LogEvent(const std::string& logger_name, LogLevel::Level level, const char* file, int32_t line,
+             int64_t elapse, uint32_t thread_id, uint64_t fiber_id, time_t time,
+             const std::string& thread_name);
 
     /**
      * @brief 获取日志级别
      */
-    LogLevel::Level getLevel() const { return m_level; }
+    LogLevel::Level getLevel() const {
+        return m_level;
+    }
 
     /**
      * @brief 获取日志内容
      */
-    std::string getContent() const { return m_ss.str(); }
+    std::string getContent() const {
+        return m_ss.str();
+    }
 
     /**
      * @brief 获取文件名
      */
-    std::string getFile() const { return m_file; }
+    std::string getFile() const {
+        return m_file;
+    }
 
     /**
      * @brief 获取行号
      */
-    int32_t getLine() const { return m_line; }
+    int32_t getLine() const {
+        return m_line;
+    }
 
     /**
      * @brief 获取累计运行毫秒数
      */
-    int64_t getElapse() const { return m_elapse; }
+    int64_t getElapse() const {
+        return m_elapse;
+    }
 
     /**
      * @brief 获取线程id
      */
-    uint32_t getThreadId() const { return m_threadId; }
+    uint32_t getThreadId() const {
+        return m_threadId;
+    }
 
     /**
      * @brief 获取协程id
      */
-    uint64_t getFiberId() const { return m_fiberId; }
+    uint64_t getFiberId() const {
+        return m_fiberId;
+    }
 
     /**
      * @brief 返回时间戳
      */
-    time_t getTime() const { return m_time; }
+    time_t getTime() const {
+        return m_time;
+    }
 
     /**
      * @brief 获取线程名称
      */
-    const std::string& getThreadName() const { return m_threadName; }
+    const std::string& getThreadName() const {
+        return m_threadName;
+    }
 
     /**
      * @brief 获取内容字节流，用于流式写入日志
      */
-    std::stringstream& getSS() { return m_ss; }
+    std::stringstream& getSS() {
+        return m_ss;
+    }
 
     /**
      * @brief 获取日志器名称
      */
-    const std::string& getLoggerName() const { return m_loggerName; }
+    const std::string& getLoggerName() const {
+        return m_loggerName;
+    }
 
     /**
      * @brief C prinf风格写入日志
@@ -194,7 +220,8 @@ public:
      * - %%m 消息
      * - %%p 日志级别
      * - %%c 日志器名称
-     * - %%d 日期时间，后面可跟一对括号指定时间格式，比如%%d{%%Y-%%m-%%d %%H:%%M:%%S}，这里的格式字符与C语言strftime一致
+     * - %%d 日期时间，后面可跟一对括号指定时间格式，比如%%d{%%Y-%%m-%%d
+     * %%H:%%M:%%S}，这里的格式字符与C语言strftime一致
      * - %%r 该日志器创建后的累计运行毫秒数
      * - %%f 文件名
      * - %%l 行号
@@ -207,7 +234,8 @@ public:
      *
      * 默认格式：%%d{%%Y-%%m-%%d %%H:%%M:%%S}%%T%%t%%T%%N%%T%%F%%T[%%p]%%T[%%c]%%T%%f:%%l%%T%%m%%n
      */
-    LogFormatter(const std::string& pattern = "%d{%Y-%m-%d %H:%M:%S} [%rms]%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");
+    LogFormatter(const std::string& pattern =
+                     "%d{%Y-%m-%d %H:%M:%S} [%rms]%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n");
 
     /**
      * @brief 初始化，解析格式模板，提取模板项
@@ -217,7 +245,9 @@ public:
     /**
      * @brief 模板解析是否出错
      */
-    bool isError() const { return m_error; }
+    bool isError() const {
+        return m_error;
+    }
 
     /**
      * @brief 对日志事件进行格式化，返回格式化日志文本
@@ -237,7 +267,9 @@ public:
     /**
      * @brief 获取pattern，日志格式化模板
      */
-    std::string getPattern() const { return m_pattern; }
+    std::string getPattern() const {
+        return m_pattern;
+    }
 
 public:
     /**
@@ -250,7 +282,7 @@ public:
         /**
          * @brief 析构函数
          */
-        virtual ~FormatItem() {}
+        virtual ~FormatItem() = default;
 
         /**
          * @brief 格式化日志事件
@@ -267,13 +299,278 @@ private:
     bool m_error = false;
 };
 
-LogFormatter::LogFormatter(const std::string &pattern)
+LogFormatter::LogFormatter(const std::string& pattern)
     : m_pattern(pattern) {
     init();
 }
 
+/**
+ * @brief 日志输出地，虚基类，用于派生出具体的输出类
+ */
+class LogAppender {
+public:
+    using ptr = std::shared_ptr<LogAppender>;
+    using MutexType = Spinlock;
 
+    /**
+     * @brief 构造函数
+     * @param[in] default_formatter 默认日志格式器
+     */
+    LogAppender(LogFormatter::ptr default_formatter);
 
-};  // namespace sylar
+    /**
+     * @brief 析构函数
+     */
+    virtual ~LogAppender() = default;
+
+    /**
+     * @brief 设置日志格式器
+     */
+    void setFormatter(LogFormatter::ptr val);
+
+    /**
+     * @brief 获取日志格式器
+     */
+    LogFormatter::ptr getFormatter();
+
+    /**
+     * @brief 写入日志
+     */
+    virtual void log(LogEvent::ptr event) = 0;
+
+    /**
+     * @brief 将日志输出目标的配置转成YAML String
+     */
+    virtual std::string toYamlString() = 0;
+
+protected:
+    /// Mutex
+    MutexType m_mutex;
+    /// 日志格式器
+    LogFormatter::ptr m_formatter;
+    /// 默认日志格式器
+    LogFormatter::ptr m_defaultFormatter;
+};
+
+/**
+ * @brief 输出到控制台的Appender
+ */
+class StdoutLogAppender : public LogAppender {
+public:
+    using ptr = std::shared_ptr<StdoutLogAppender>;
+
+    /**
+     * @brief 构造函数
+     */
+    StdoutLogAppender();
+
+    /**
+     * @brief 写入日志
+     */
+    void log(LogEvent::ptr event) override;
+
+    /**
+     * @brief 将日志输出目标的配置转成YAML String
+     */
+    std::string toYamlString() override;
+};
+
+/**
+ * @brief 输出到文件
+ */
+class FileLogAppender : public LogAppender {
+public:
+    using ptr = std::shared_ptr<FileLogAppender>;
+
+    /**
+     * @brief 构造函数
+     * @param[in] file 日志文件路径
+     */
+    FileLogAppender(const std::string& file);
+
+    /**
+     * @brief 写日志
+     */
+    void log(LogEvent::ptr event) override;
+
+    /**
+     * @brief 重新打开日志文件
+     * @return 成功返回true
+     */
+    bool reopen();
+
+    /**
+     * @brief 将日志输出目标的配置转成YAML String
+     */
+    std::string toYamlString() override;
+
+private:
+    /// 文件路径
+    std::string m_filename;
+    /// 文件流
+    std::ofstream m_filestream;
+    /// 上次重打打开时间
+    uint64_t m_lastTime = 0;
+    /// 文件打开错误标识
+    bool m_reopenError = false;
+};
+
+/**
+ * @brief 日志器类
+ * @note 日志器类不带root logger
+ */
+class Logger {
+public:
+    using ptr = std::shared_ptr<Logger>;
+    using MutexType = Spinlock;
+
+    /**
+     * @brief 构造函数
+     * @param[in] name 日志器名称
+     */
+    Logger(const std::string& name = "default");
+
+    /**
+     * @brief 获取日志器名称
+     */
+    const std::string& getName() const {
+        return m_name;
+    }
+
+    /**
+     * @brief 获取创建时间
+     */
+    const uint64_t& getCreateTime() const {
+        return m_createTime;
+    }
+
+    /**
+     * @brief 设置日志级别
+     */
+    void setLevel(LogLevel::Level level) {
+        m_level = level;
+    }
+
+    /**
+     * @brief 获取日志级别
+     */
+    LogLevel::Level getLevel() const {
+        return m_level;
+    }
+
+    /**
+     * @brief 添加LogAppender
+     */
+    void addAppender(LogAppender::ptr appender);
+
+    /**
+     * @brief 删除LogAppender
+     */
+    void delAppender(LogAppender::ptr appender);
+
+    /**
+     * @brief 清空LogAppender
+     */
+    void clearAppenders();
+
+    /**
+     * @brief 写日志
+     */
+    void log(LogEvent::ptr event);
+
+    /**
+     * @brief 将日志器的配置转成YAML String
+     */
+    std::string toYamlString();
+
+private:
+    /// Mutex
+    MutexType m_mutex;
+    /// 日志器名称
+    std::string m_name;
+    /// 日志器等级
+    LogLevel::Level m_level;
+    /// LogAppender集合
+    std::list<LogAppender::ptr> m_appenders;
+    /// 创建时间（毫秒）
+    uint64_t m_createTime;
+};
+
+/**
+ * @brief 日志事件包装器，方便宏定义，内部包含日志事件和日志器
+ */
+class LogEventWrap {
+public:
+    /**
+     * @brief 构造函数
+     * @param[in] logger 日志器
+     * @param[in] event 日志事件
+     */
+    LogEventWrap(Logger::ptr logger, LogEvent::ptr event);
+
+    /**
+     * @brief 析构函数
+     * @details 日志事件在析构时由日志器进行输出
+     */
+    ~LogEventWrap();
+
+    /**
+     * @brief 获取日志事件
+     */
+    LogEvent::ptr getLogEvent() const {
+        return m_event;
+    }
+
+private:
+    /// 日志器
+    Logger::ptr m_logger;
+    /// 日志事件
+    LogEvent::ptr m_event;
+};
+
+/**
+ * @brief 日志器管理类
+ */
+class LoggerManager {
+public:
+    using MutexType = Spinlock;
+
+    /**
+     * @brief 构造函数
+     */
+    LoggerManager();
+
+    /**
+     * @brief 初始化，主要是结合配置模块实现日志模块初始化
+     */
+    void init();
+
+    /**
+     * @brief 获取指定名称的日志器
+     */
+    Logger::ptr getLogger(const std::string& name);
+
+    /**
+     * @brief 获取root日志器，等效于getLogger("root")
+     */
+    Logger::ptr getRoot() {
+        return m_root;
+    }
+
+    /**
+     * @brief 将所有的日志器配置转成YAML String
+     */
+    std::string toYamlString();
+
+private:
+    /// Mutex
+    MutexType m_mutex;
+    /// 日志器集合
+    std::map<std::string, Logger::ptr> m_loggers;
+    /// root日志器
+    Logger::ptr m_root;
+};
+
+};   // namespace sylar
 
 #endif
