@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-27 09:07:13
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-27 09:07:15
+ * @LastEditTime: 2024-11-30 15:01:58
  * @FilePath: /MySylar/sylar/noncopyable.h
  */
 #ifndef __SYLAR_NONCOPYABLE_H__
@@ -33,6 +33,6 @@ public:
     Noncopyable& operator=(const Noncopyable&) = delete;
 };
 
-};
+};   // namespace sylar
 
 #endif

@@ -23,9 +23,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-builtin-macro-
 set(LIB_SRC
     sylar/log.cc
     sylar/mutex.cc
+    env.cc
 )
 
 add_library(sylar SHARED ${LIB_SRC})
+force_redefine_file_macro_for_sources(sylar)
+
+set(LIBS
+    sylar
+    pthread
+    dl
+    yaml-cpp
+)
 
 # 测试
 option(BUILD_TEST "ON for complile test" ON)

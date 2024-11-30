@@ -2,11 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2024-11-25 22:53:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-29 20:26:09
+ * @LastEditTime: 2024-11-30 16:35:42
  * @FilePath: /MySylar/sylar/log.cc
  */
 
 #include "log.h"
+
+#include "config.h"
+#include "util.h"
 
 #include <cstdarg>
 #include <functional>
@@ -615,6 +618,13 @@ LogEventWrap::LogEventWrap(Logger::ptr logger, LogEvent::ptr event)
  */
 LogEventWrap::~LogEventWrap() {
     m_logger->log(m_event);
+}
+
+LoggerManager::LoggerManager() {
+    m_root.reset(new Logger("root"));
+    m_root->addAppender(LogAppender::ptr(new StdoutLogAppender));
+    m_loggers[m_root->getName()] = m_root;
+    init();
 }
 
 /**
