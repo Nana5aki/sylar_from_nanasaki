@@ -2,13 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 15:44:46
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-30 16:42:13
+ * @LastEditTime: 2024-12-07 23:11:16
  * @FilePath: /MySylar/sylar/env.cc
  */
 #include "env.h"
 #include "log.h"
 #include <cstdlib>
 #include <unistd.h>
+#include <iomanip>
 
 namespace sylar {
 
@@ -60,6 +61,82 @@ bool Env::init(int argc, char** argv) {
         add(now_key, "");
     }
     return true;
+}
+
+void Env::add(const std::string &key, const std::string &val) {
+    RWMutexType::WriteLock lock(m_mutex);
+    m_args[key] = val;
+}
+
+bool Env::has(const std::string &key) {
+    RWMutexType::ReadLock lock(m_mutex);
+    auto it = m_args.find(key);
+    return it != m_args.end();
+}
+
+void Env::del(const std::string &key) {
+    RWMutexType::WriteLock lock(m_mutex);
+    m_args.erase(key);
+}
+
+std::string Env::get(const std::string &key, const std::string &default_value) {
+    RWMutexType::ReadLock lock(m_mutex);
+    auto it = m_args.find(key);
+    return it != m_args.end() ? it->second : default_value;
+}
+
+void Env::addHelp(const std::string &key, const std::string &desc) {
+    removeHelp(key);
+    RWMutexType::WriteLock lock(m_mutex);
+    m_helps.push_back(std::make_pair(key, desc));
+}
+
+void Env::removeHelp(const std::string &key) {
+    RWMutexType::WriteLock lock(m_mutex);
+    for (auto it = m_helps.begin();
+         it != m_helps.end();) {
+        if (it->first == key) {
+            it = m_helps.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void Env::printHelp() {
+    RWMutexType::ReadLock lock(m_mutex);
+    std::cout << "Usage: " << m_program << " [options]" << std::endl;
+    for (auto &i : m_helps) {
+        // setw() 函数用于设置字段的宽度
+        // 当后面紧跟着的输出字段长度小于 n 的时候，在该字段前面用空格补齐，当输出字段长度大于 n 时，全部整体输出
+        std::cout << std::setw(5) << "-" << i.first << " : " << i.second << std::endl;
+    }
+}
+
+bool Env::setEnv(const std::string &key, const std::string &val) {
+    return !setenv(key.c_str(), val.c_str(), 1);
+}
+
+std::string Env::getEnv(const std::string &key, const std::string &default_value) {
+    const char *v = getenv(key.c_str());
+    if (v == nullptr) {
+        return default_value;
+    }
+    return v;
+}
+
+std::string Env::getAbsolutePath(const std::string &path) const {
+    if (path.empty()) {
+        return "/";
+    }
+    if (path[0] == '/') {
+        return path;
+    }
+    return m_cwd + path;
+}
+
+std::string Env::getConfigPath() {
+    return getAbsolutePath(get("c", "conf"));
 }
 
 }   // namespace sylar
