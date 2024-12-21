@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-25 22:53:56
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-30 16:42:41
+ * @LastEditTime: 2024-12-21 23:35:53
  * @FilePath: /MySylar/sylar/log.h
  */
 
@@ -13,19 +13,31 @@
  * 3.日志接口执行结束后，LogEventWrap对象析构，在析构函数里调用Logger的log方法将日志事件进行输出
  */
 
-#ifndef __SYLAR_LOG_H
-#define __SYLAR_LOG_H
+#ifndef __SYLAR_LOG_H__
+#define __SYLAR_LOG_H__
 
+#include <string>
+#include <memory>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include <cstdarg>
+#include <list>
+#include <map>
+#include "util.h"
 #include "mutex.h"
 #include "singleton.h"
-#include "util.h"
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <memory>
-#include <sstream>
-#include <vector>
+
+/**
+ * @brief 获取root日志器
+ */
+#define SYLAR_LOG_ROOT() sylar::LoggerMgr::GetInstance()->getRoot()
+
+/**
+ * @brief 获取指定名称的日志器
+ */
+#define SYLAR_LOG_NAME(name) sylar::LoggerMgr::GetInstance()->getLogger(name)
 
 /**
  * @brief 使用流式方式将日志级别level的日志写入到logger
@@ -358,7 +370,7 @@ public:
      */
     class FormatItem {
     public:
-        typedef std::shared_ptr<FormatItem> ptr;
+        using ptr = std::shared_ptr<FormatItem>;
 
         /**
          * @brief 析构函数
@@ -379,11 +391,6 @@ private:
     /// 是否出错
     bool m_error = false;
 };
-
-LogFormatter::LogFormatter(const std::string& pattern)
-    : m_pattern(pattern) {
-    init();
-}
 
 /**
  * @brief 日志输出地，虚基类，用于派生出具体的输出类

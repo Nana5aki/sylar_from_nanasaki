@@ -2,18 +2,18 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:28:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 19:07:13
+ * @LastEditTime: 2024-12-21 20:01:05
  * @FilePath: /MySylar/sylar/util.cc
  */
 
 #include "util.h"
+#include <cstring>
 #include <dirent.h>
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <time.h>
 #include <unistd.h>
-#include <cstring>
 
 namespace sylar {
 
@@ -35,6 +35,10 @@ std::string GetThreadName() {
     char thread_name[16] = {0};
     pthread_getname_np(pthread_self(), thread_name, 16);
     return std::string(thread_name);
+}
+
+void SetThreadName(const std::string& name) {
+    pthread_setname_np(pthread_self(), name.substr(0, 15).c_str());
 }
 
 void FSUtil::ListAllFile(std::vector<std::string>& files, const std::string& path,

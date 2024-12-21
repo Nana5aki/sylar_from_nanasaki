@@ -20,11 +20,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic -fPIC")
 # -Wno-deprecated-declarations: 不要警告使用带deprecated属性的变量，类型，函数
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated -Wno-deprecated-declarations")
 
+include_directories(.)
+
 set(LIB_SRC
     sylar/log.cc
     sylar/mutex.cc
-    env.cc
+    sylar/env.cc
+    sylar/config.cc
+    sylar/util.cc
 )
+
+find_package(Boost REQUIRED) 
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 add_library(sylar SHARED ${LIB_SRC})
 force_redefine_file_macro_for_sources(sylar)
@@ -36,12 +45,21 @@ set(LIBS
     yaml-cpp
 )
 
+set(LIBS
+    sylar
+    pthread
+    dl
+    yaml-cpp
+)
+
 # 测试
 option(BUILD_TEST "ON for complile test" ON)
 if(BUILD_TEST) 
-
-ennif()
+sylar_add_executable(test_log "tests/test_log.cpp" sylar "${LIBS}")
+sylar_add_executable(test_env "tests/test_env.cpp" sylar "${LIBS}")
+sylar_add_executable(test_config "tests/test_config.cpp" sylar "${LIBS}")
+endif()
 
 # 输出路径
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/output)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

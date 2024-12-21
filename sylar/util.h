@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:27:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 19:06:24
+ * @LastEditTime: 2024-12-21 20:00:43
  * @FilePath: /MySylar/sylar/util.h
  */
 #ifndef __SYLAR_UTIL_H__
@@ -37,6 +37,12 @@ uint64_t GetElapsedMS();
  * @brief 获取线程名称，参考pthread_getname_np(3)
  */
 std::string GetThreadName();
+
+/**
+ * @brief 设置线程名称，参考pthread_setname_np(3)
+ * @note 线程名称不能超过16字节，包括结尾的'\0'字符
+ */
+void SetThreadName(const std::string& name);
 
 class FSUtil {
 public:

@@ -2,12 +2,11 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:26:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 19:09:44
+ * @LastEditTime: 2024-12-21 22:14:55
  * @FilePath: /MySylar/sylar/config.cc
  */
 #include "config.h"
 #include "env.h"
-#include "log.h"
 #include <sys/stat.h>
 
 namespace sylar {

@@ -2,12 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:26:01
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 18:53:51
+ * @LastEditTime: 2024-12-21 22:39:37
  * @FilePath: /MySylar/sylar/config.h
  */
 #ifndef __SYLAR_CONFIG_H__
 #define __SYLAR_CONFIG_H__
 
+#include "log.h"
+#include "mutex.h"
 #include "util.h"
 #include <boost/lexical_cast.hpp>
 #include <unordered_set>
@@ -67,7 +69,7 @@ public:
      */
     virtual std::string getTypeName() const = 0;
 
-private:
+protected:
     /// 配置参数的名称
     std::string m_name;
     /// 配置参数的描述
@@ -315,11 +317,11 @@ public:
  *          std::string 为YAML格式的字符串
  */
 template <typename T, typename FromStr = LexicalCast<std::string, T>,
-          typename ToStar = LexicalCast<T, std::string>>
+          typename ToStr = LexicalCast<T, std::string>>
 class ConfigVar : public ConfigVarBase {
 public:
     using RWMutexType = RWMutex;
-    using ptr = std::shared_ptr<ConfigBar>;
+    using ptr = std::shared_ptr<ConfigVar>;
     using on_change_cb = std::function<void(const T& old_value, const T& new_value)>;
 
     /**

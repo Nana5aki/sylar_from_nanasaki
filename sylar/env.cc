@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 15:44:46
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-07 23:11:16
+ * @LastEditTime: 2024-12-21 23:07:12
  * @FilePath: /MySylar/sylar/env.cc
  */
 #include "env.h"
@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <iomanip>
+#include <string.h>
 
 namespace sylar {
 

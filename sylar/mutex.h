@@ -2,17 +2,19 @@
  * @Author: Nana5aki
  * @Date: 2024-11-27 09:05:56
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-27 18:55:24
+ * @LastEditTime: 2024-12-21 22:23:23
  * @FilePath: /MySylar/sylar/mutex.h
  */
-#ifndef __SYLAR_MUTEX_H_
-#define __SYLAR_MUTEX_H_
+#ifndef __SYLAR_MUTEX_H__
+#define __SYLAR_MUTEX_H__
 
 #include "noncopyable.h"
 
 #include <atomic>
 #include <semaphore.h>
 #include <stdint.h>
+#include <thread>
+#include <pthread.h>
 
 namespace sylar {
 
