@@ -56,7 +56,10 @@
         "list": "cpp",
         "set": "cpp",
         "iomanip": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "unordered_set": "cpp",
+        "strstream": "cpp",
+        "source_location": "cpp"
     },
     "C_Cpp.clang_format_path": "",
     "C_Cpp.clang_format_fallbackStyle": "Google",

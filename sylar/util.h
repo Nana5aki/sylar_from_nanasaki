@@ -2,15 +2,17 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:27:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-30 16:46:57
+ * @LastEditTime: 2024-12-21 19:06:24
  * @FilePath: /MySylar/sylar/util.h
  */
 #ifndef __SYLAR_UTIL_H__
 #define __SYLAR_UTIL_H__
 
+#include <cxxabi.h>
 #include <stdint.h>
 #include <string>
 #include <sys/types.h>
+#include <vector>
 
 namespace sylar {
 
@@ -35,6 +37,28 @@ uint64_t GetElapsedMS();
  * @brief 获取线程名称，参考pthread_getname_np(3)
  */
 std::string GetThreadName();
+
+class FSUtil {
+public:
+    /**
+     * @brief
+     * 递归列举指定目录下所有指定后缀的常规文件，如果不指定后缀，则遍历所有文件，返回的文件名带路径
+     * @param[out] files 文件列表
+     * @param[in] path 路径
+     * @param[in] subfix 后缀名，比如 ".yml"
+     */
+    static void ListAllFile(std::vector<std::string>& files, const std::string& path,
+                            const std::string& subfix);
+};
+
+/**
+ * @brief 获取T类型的类型字符串
+ */
+template <class T>
+const char* TypeToName() {
+    static const char* s_name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+    return s_name;
+}
 
 }   // namespace sylar
 

@@ -2,13 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 15:44:42
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-30 15:50:36
+ * @LastEditTime: 2024-12-21 19:03:42
  * @FilePath: /MySylar/sylar/env.h
  */
 #ifndef __SYLAR_ENV_H__
 #define __SYLAR_ENV_H__
 
 #include "mutex.h"
+#include "singleton.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -123,6 +124,11 @@ private:
     /// 当前路径，从argv[0]中获取
     std::string m_cwd;
 };
+
+/**
+ * @brief 环境变量管理类单例
+ */
+using EnvMgr = sylar::Singleton<Env>;
 
 }   // namespace sylar
 
