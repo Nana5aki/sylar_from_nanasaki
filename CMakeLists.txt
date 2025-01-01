@@ -28,6 +28,7 @@ set(LIB_SRC
     sylar/env.cc
     sylar/config.cc
     sylar/util.cc
+    sylar/thread.cc
 )
 
 find_package(Boost REQUIRED) 
@@ -45,19 +46,13 @@ set(LIBS
     yaml-cpp
 )
 
-set(LIBS
-    sylar
-    pthread
-    dl
-    yaml-cpp
-)
-
 # 测试
 option(BUILD_TEST "ON for complile test" ON)
 if(BUILD_TEST) 
 sylar_add_executable(test_log "tests/test_log.cpp" sylar "${LIBS}")
 sylar_add_executable(test_env "tests/test_env.cpp" sylar "${LIBS}")
 sylar_add_executable(test_config "tests/test_config.cpp" sylar "${LIBS}")
+sylar_add_executable(test_thread "tests/test_thread.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径

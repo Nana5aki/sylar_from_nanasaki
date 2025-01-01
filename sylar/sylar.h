@@ -16,4 +16,5 @@
 #include "noncopyable.h"
 #include "singleton.h"
 #include "util.h"
+#include "thread.h"
 #endif
