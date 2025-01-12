@@ -30,6 +30,7 @@ set(LIB_SRC
     sylar/util.cc
     sylar/thread.cc
     sylar/fiber.cc
+    sylar/scheduler.cc
 )
 
 find_package(Boost REQUIRED) 
@@ -55,6 +56,7 @@ sylar_add_executable(test_env "tests/test_env.cpp" sylar "${LIBS}")
 sylar_add_executable(test_config "tests/test_config.cpp" sylar "${LIBS}")
 sylar_add_executable(test_thread "tests/test_thread.cpp" sylar "${LIBS}")
 sylar_add_executable(test_fiber "tests/test_fiber.cpp" sylar "${LIBS}")
+sylar_add_executable(test_scheduler "tests/test_scheduler.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径

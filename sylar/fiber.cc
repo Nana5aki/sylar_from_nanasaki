@@ -2,13 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2025-01-01 15:06:39
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-04 21:24:31
+ * @LastEditTime: 2025-01-12 12:40:06
  * @FilePath: /MySylar/sylar/fiber.cc
  */
 #include "fiber.h"
 #include "config.h"
 #include "log.h"
 #include "macro.h"
+#include "scheduler.h"
 #include <atomic>
 
 /*
@@ -190,9 +191,9 @@ void Fiber::resume() {
 
     // 如果协程参与调度器调度，那么应该和调度器的主协程进行swap，而不是线程主协程
     if (m_runInScheduler) {
-        // if (swapcontext(&(Scheduler::GetMainFiber()->m_ctx), &m_ctx)) {
-        //     SYLAR_ASSERT2(false, "swapcontext");
-        // }
+        if (swapcontext(&(Scheduler::GetMainFiber()->m_ctx), &m_ctx)) {
+            SYLAR_ASSERT2(false, "swapcontext");
+        }
     } else {
         if (swapcontext(&(t_thread_fiber->m_ctx), &m_ctx)) {
             SYLAR_ASSERT2(false, "swapcontext");
