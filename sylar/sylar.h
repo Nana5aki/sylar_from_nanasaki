@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-12-21 19:59:12
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-11 23:04:15
+ * @LastEditTime: 2025-01-12 15:11:12
  * @FilePath: /MySylar/sylar/sylar.h
  */
 #ifndef __SYLAR_SYLAR_H__
@@ -19,4 +19,6 @@
 #include "thread.h"
 #include "fiber.h"
 #include "scheduler.h"
+#include "iomanager.h"
+#include "time.h"
 #endif
