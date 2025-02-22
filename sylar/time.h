@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-01-12 15:10:42
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-02-15 18:03:21
+ * @LastEditTime: 2025-02-22 14:14:30
  * @FilePath: /MySylar/sylar/time.h
  */
 #ifndef __SYLAR_TIMER_H__
@@ -149,20 +149,12 @@ protected:
   void addTimer(Timer::ptr val, RWMutexType::WriteLock& lock);
 
 private:
-  /**
-   * @brief 检测服务器时间是否被调后了
-   */
-  bool detectClockRollover(uint64_t now_ms);
-
-private:
   /// Mutex
   RWMutexType m_mutex;
   /// 定时器集合
   std::set<Timer::ptr, Timer::Comparator> m_timers;
   /// 是否触发onTimerInsertedAtFront
   bool m_tickled = false;
-  /// 上次执行时间
-  uint64_t m_previouseTime = 0;
 };
 
 }   // namespace sylar
