@@ -31,7 +31,7 @@ set(LIB_SRC
     sylar/thread.cc
     sylar/fiber.cc
     sylar/scheduler.cc
-    sylar/time.cc
+    sylar/timer.cc
     sylar/iomanager.cc
 )
 
