@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-25 22:53:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 23:50:36
+ * @LastEditTime: 2025-03-03 23:31:05
  * @FilePath: /MySylar/sylar/log.cc
  */
 
@@ -795,7 +795,7 @@ struct LogIniter {
                     } else {
                         if (!(i == *it)) {
                             // 修改的logger
-                            logger == SYLAR_LOG_NAME(i.name);
+                            logger = SYLAR_LOG_NAME(i.name);
                         } else {
                             continue;
                         }

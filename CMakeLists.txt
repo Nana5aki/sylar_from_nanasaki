@@ -8,7 +8,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # -O0：关闭所有优化
 # -ggdb：启用调试信息的生成
 # -Werror：将所有警告视为错误
-set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -std=c++20 -O0 -ggdb -Wall -Werror")
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -std=c++2a -O0 -ggdb -Wall -Werror")
 
 # -rdynamic: 将所有符号都加入到符号表中，便于使用dlopen或者backtrace追踪到符号
 # -fPIC: 生成位置无关的代码，便于动态链接
@@ -59,6 +59,8 @@ sylar_add_executable(test_config "tests/test_config.cpp" sylar "${LIBS}")
 sylar_add_executable(test_thread "tests/test_thread.cpp" sylar "${LIBS}")
 sylar_add_executable(test_fiber "tests/test_fiber.cpp" sylar "${LIBS}")
 sylar_add_executable(test_scheduler "tests/test_scheduler.cpp" sylar "${LIBS}")
+sylar_add_executable(test_iomanager "tests/test_iomanager.cpp" sylar "${LIBS}")
+sylar_add_executable(test_timer "tests/test_timer.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径
