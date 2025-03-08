@@ -15,10 +15,9 @@ namespace sylar {
 
 class IOManager : public Scheduler, public TimerManager {
 public:
-  using ptr = std::shared_ptr<IOManager>;
-  using RWMutexType = RWMutex;
+  typedef std::shared_ptr<IOManager> ptr;
+  typedef RWMutex RWMutexType;
 
-public:
   /**
    * @brief IO事件，继承自epoll对事件的定义
    * @details 这里只关心socket fd的读和写事件，其他epoll事件会归类到这两类事件中
@@ -186,13 +185,13 @@ private:
   /// pipe 文件句柄，fd[0]读端，fd[1]写端
   int m_tickleFds[2];
   /// 当前等待执行的IO事件数量
-  std::atomic<size_t> m_pendingEventCount {0};
+  std::atomic<size_t> m_pendingEventCount = {0};
   /// IOManager的Mutex
   RWMutexType m_mutex;
   /// socket事件上下文的容器
-  std::vector<std::unique_ptr<FdContext>> m_fdContexts;
+  std::vector<FdContext*> m_fdContexts;
 };
 
-}   // namespace sylar
+}   // end namespace sylar
 
 #endif

@@ -1,17 +1,16 @@
-/*
- * @Author: Nana5aki
- * @Date: 2025-01-12 15:08:57
- * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-02 16:46:20
- * @FilePath: /MySylar/sylar/iomanager.cc
+/**
+ * @file iomanager.cc
+ * @brief IO协程调度器实现
+ * @version 0.1
+ * @date 2021-06-16
  */
 
 #include "iomanager.h"
 #include "log.h"
 #include "macro.h"
-#include <fcntl.h>
-#include <sys/epoll.h>
-#include <unistd.h>
+#include <fcntl.h>       // for fcntl()
+#include <sys/epoll.h>   // for epoll_xxx()
+#include <unistd.h>      // for pipe()
 
 namespace sylar {
 
@@ -132,6 +131,12 @@ IOManager::~IOManager() {
   close(m_epfd);
   close(m_tickleFds[0]);
   close(m_tickleFds[1]);
+
+  for (size_t i = 0; i < m_fdContexts.size(); ++i) {
+    if (m_fdContexts[i]) {
+      delete m_fdContexts[i];
+    }
+  }
 }
 
 void IOManager::contextResize(size_t size) {
@@ -139,7 +144,7 @@ void IOManager::contextResize(size_t size) {
 
   for (size_t i = 0; i < m_fdContexts.size(); ++i) {
     if (!m_fdContexts[i]) {
-      m_fdContexts[i] = std::make_unique<FdContext>();
+      m_fdContexts[i] = new FdContext;
       m_fdContexts[i]->fd = i;
     }
   }
@@ -149,14 +154,14 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> cb) {
   // 找到fd对应的FdContext，如果不存在，那就分配一个
   FdContext* fd_ctx = nullptr;
   RWMutexType::ReadLock lock(m_mutex);
-  if (static_cast<int>(m_fdContexts.size()) > fd) {
-    fd_ctx = m_fdContexts[fd].get();
+  if ((int)m_fdContexts.size() > fd) {
+    fd_ctx = m_fdContexts[fd];
     lock.unlock();
   } else {
     lock.unlock();
     RWMutexType::WriteLock lock2(m_mutex);
     contextResize(fd * 1.5);
-    fd_ctx = m_fdContexts[fd].get();
+    fd_ctx = m_fdContexts[fd];
   }
 
   // 同一个fd不允许重复添加相同的事件
@@ -208,7 +213,7 @@ bool IOManager::delEvent(int fd, Event event) {
   if ((int)m_fdContexts.size() <= fd) {
     return false;
   }
-  FdContext* fd_ctx = m_fdContexts[fd].get();
+  FdContext* fd_ctx = m_fdContexts[fd];
   lock.unlock();
 
   FdContext::MutexType::Lock lock2(fd_ctx->mutex);
@@ -246,7 +251,7 @@ bool IOManager::cancelEvent(int fd, Event event) {
   if ((int)m_fdContexts.size() <= fd) {
     return false;
   }
-  FdContext* fd_ctx = m_fdContexts[fd].get();
+  FdContext* fd_ctx = m_fdContexts[fd];
   lock.unlock();
 
   FdContext::MutexType::Lock lock2(fd_ctx->mutex);
@@ -282,7 +287,7 @@ bool IOManager::cancelAll(int fd) {
   if ((int)m_fdContexts.size() <= fd) {
     return false;
   }
-  FdContext* fd_ctx = m_fdContexts[fd].get();
+  FdContext* fd_ctx = m_fdContexts[fd];
   lock.unlock();
 
   FdContext::MutexType::Lock lock2(fd_ctx->mutex);

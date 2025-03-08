@@ -2,29 +2,31 @@
  * @Author: Nana5aki
  * @Date: 2025-01-12 15:10:42
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-02-22 14:14:30
- * @FilePath: /MySylar/sylar/time.h
+ * @LastEditTime: 2025-03-08 10:56:05
+ * @FilePath: /MySylar/sylar/timer.h
  */
 #ifndef __SYLAR_TIMER_H__
 #define __SYLAR_TIMER_H__
 
 #include "mutex.h"
-#include <functional>
 #include <memory>
 #include <set>
 #include <vector>
+#include <functional>
 
 namespace sylar {
 
 class TimerManager;
-
+/**
+ * @brief 定时器
+ */
 class Timer : public std::enable_shared_from_this<Timer> {
-  friend TimerManager;
+  friend class TimerManager;
 
 public:
-  using ptr = std::shared_ptr<Timer>;
+  /// 定时器的智能指针类型
+  typedef std::shared_ptr<Timer> ptr;
 
-public:
   /**
    * @brief 取消定时器
    */
@@ -50,9 +52,7 @@ private:
    * @param[in] recurring 是否循环
    * @param[in] manager 定时器管理器
    */
-  Timer(uint64_t ms, std::function<void()> cb, bool recurring,
-        std::shared_ptr<TimerManager> manager);
-
+  Timer(uint64_t ms, std::function<void()> cb, bool recurring, TimerManager* manager);
   /**
    * @brief 构造函数
    * @param[in] next 执行的时间戳(毫秒)
@@ -69,7 +69,7 @@ private:
   /// 回调函数
   std::function<void()> m_cb;
   /// 定时器管理器
-  std::weak_ptr<TimerManager> m_manager;
+  TimerManager* m_manager = nullptr;
 
 private:
   /**
@@ -88,11 +88,13 @@ private:
 /**
  * @brief 定时器管理器
  */
-class TimerManager : public std::enable_shared_from_this<TimerManager>{
-  friend Timer;
-  using RWMutexType = RWMutex;
+class TimerManager {
+  friend class Timer;
 
 public:
+  /// 读写锁类型
+  typedef RWMutex RWMutexType;
+
   /**
    * @brief 构造函数
    */
@@ -101,7 +103,7 @@ public:
   /**
    * @brief 析构函数
    */
-  virtual ~TimerManager() = default;
+  virtual ~TimerManager();
 
   /**
    * @brief 添加定时器
@@ -149,12 +151,20 @@ protected:
   void addTimer(Timer::ptr val, RWMutexType::WriteLock& lock);
 
 private:
+  /**
+   * @brief 检测服务器时间是否被调后了
+   */
+  bool detectClockRollover(uint64_t now_ms);
+
+private:
   /// Mutex
   RWMutexType m_mutex;
   /// 定时器集合
   std::set<Timer::ptr, Timer::Comparator> m_timers;
   /// 是否触发onTimerInsertedAtFront
   bool m_tickled = false;
+  /// 上次执行时间
+  uint64_t m_previouseTime = 0;
 };
 
 }   // namespace sylar
