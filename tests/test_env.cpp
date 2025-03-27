@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-12-21 19:49:27
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-12-21 21:48:37
+ * @LastEditTime: 2025-03-27 09:07:58
  * @FilePath: /MySylar/tests/test_env.cpp
  */
 #include "sylar/sylar.h"
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
     if (is_print_help) {
         g_env->printHelp();
-        return false;
+        return 0;
     }
 
     SYLAR_LOG_INFO(g_logger) << "exe: " << g_env->getExe();

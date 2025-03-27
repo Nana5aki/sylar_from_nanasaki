@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-02 18:16:55
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-03 23:12:03
+ * @LastEditTime: 2025-03-27 09:08:28
  * @FilePath: /MySylar/tests/test_iomanager.cpp
  */
 #include "sylar/sylar.h"
@@ -20,7 +20,7 @@ void watch_io_read();
 // 写事件回调，只执行一次，用于判断非阻塞套接字connect成功
 void do_io_write() {
   SYLAR_LOG_INFO(g_logger) << "write callback";
-  int so_err;
+  int so_err = 0;
   socklen_t len = size_t(so_err);
   getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &so_err, &len);
   if (so_err) {

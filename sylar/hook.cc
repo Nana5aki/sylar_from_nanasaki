@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-08 12:06:29
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-22 12:09:50
+ * @LastEditTime: 2025-03-27 08:57:50
  * @FilePath: /MySylar/sylar/hook.cc
  */
 #include "hook.h"
@@ -168,8 +168,8 @@ unsigned int sleep(unsigned int seconds) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(seconds * 1000,
-                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
-                            sylar::IOManager::schedule,
+                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
+                                                      int thread))&sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));
@@ -184,8 +184,8 @@ int usleep(useconds_t usec) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(usec / 1000,
-                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
-                            sylar::IOManager::schedule,
+                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
+                                                      int thread))&sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));
@@ -202,8 +202,8 @@ int nanosleep(const struct timespec* req, struct timespec* rem) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(timeout_ms,
-                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
-                            sylar::IOManager::schedule,
+                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
+                                                      int thread))&sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));

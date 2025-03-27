@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-12-28 17:37:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-01 14:15:43
+ * @LastEditTime: 2025-03-27 09:07:33
  * @FilePath: /MySylar/sylar/thread.h
  */
 #ifndef __SYLAR_THREAD_H__
@@ -10,6 +10,7 @@
 
 #include "mutex.h"
 #include <functional>
+#include <memory>
 
 namespace sylar {
 
