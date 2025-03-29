@@ -2,11 +2,12 @@
  * @Author: Nana5aki
  * @Date: 2025-01-01 23:34:33
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-12 12:39:14
+ * @LastEditTime: 2025-03-29 12:35:16
  * @FilePath: /MySylar/sylar/scheduler.cc
  */
 #include "scheduler.h"
 #include "macro.h"
+#include "hook.h"
 
 namespace sylar {
 
@@ -138,8 +139,7 @@ void Scheduler::stop() {
 
 void Scheduler::run() {
     SYLAR_LOG_DEBUG(g_logger) << "run";
-    /// @todo: 补充hook逻辑
-    // set_hook_enable(true);
+    set_hook_enable(true);
     setThis();
     if (sylar::GetThreadId() != m_rootThread) {
         t_scheduler_fiber = sylar::Fiber::GetThis().get();
@@ -219,9 +219,7 @@ void Scheduler::run() {
                 break;
             }
             ++m_idleThreadCount;
-            SYLAR_LOG_DEBUG(g_logger) << "cnm";
             idle_fiber->resume();
-            SYLAR_LOG_DEBUG(g_logger) << "cnm";
             --m_idleThreadCount;
         }
     }

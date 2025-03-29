@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-08 12:06:29
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-27 08:57:50
+ * @LastEditTime: 2025-03-29 20:54:20
  * @FilePath: /MySylar/sylar/hook.cc
  */
 #include "hook.h"
@@ -69,6 +69,7 @@ struct _HookIniter {
   }
 };
 
+/// 静态变量触发初始化逻辑
 static _HookIniter s_hook_initer;
 
 bool is_hook_enable() {
@@ -83,6 +84,25 @@ struct timer_info {
   int cancelled = 0;
 };
 
+/**
+ * @template do_io
+ * @brief 通用IO操作模板函数，添加超时和异步调度支持
+ * @tparam OriginFun 原始IO函数类型
+ * @tparam Args 可变参数类型
+ * @param fd 文件描述符
+ * @param fun 原始IO函数指针
+ * @param hook_fun_name hook函数名称（用于日志）
+ * @param event 等待的IO事件类型（READ/WRITE）
+ * @param timeout_so 套接字超时选项（SO_RCVTIMEO/SO_SNDTIMEO）
+ * @param args 原始IO函数参数
+ * @return ssize_t 操作结果，与原始系统调用一致
+ * @note 核心逻辑：
+ * 1. 检查hook启用状态和fd有效性
+ * 2. 非阻塞重试操作
+ * 3. EAGAIN时添加定时器和IO事件监听
+ * 4. 协程让出等待事件就绪
+ * 5. 处理超时和错误情况
+ */
 template <typename OriginFun, typename... Args>
 static ssize_t do_io(int fd, OriginFun fun, const char* hook_fun_name, uint32_t event,
                      int timeout_so, Args&&... args) {
@@ -108,6 +128,7 @@ static ssize_t do_io(int fd, OriginFun fun, const char* hook_fun_name, uint32_t 
   std::shared_ptr<timer_info> tinfo(new timer_info);
 
 retry:
+  // 尝试进行原始IO操作（自动处理EINTR重试）
   ssize_t n = fun(fd, std::forward<Args>(args)...);
   while (n == -1 && errno == EINTR) {
     n = fun(fd, std::forward<Args>(args)...);
@@ -156,6 +177,7 @@ retry:
 
 
 extern "C" {
+
 #define XX(name) name##_fun name##_f = nullptr;
 HOOK_FUN(XX);
 #undef XX
@@ -168,8 +190,8 @@ unsigned int sleep(unsigned int seconds) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(seconds * 1000,
-                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
-                                                      int thread))&sylar::IOManager::schedule,
+                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
+                            sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));
@@ -184,8 +206,8 @@ int usleep(useconds_t usec) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(usec / 1000,
-                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
-                                                      int thread))&sylar::IOManager::schedule,
+                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
+                            sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));
@@ -202,8 +224,8 @@ int nanosleep(const struct timespec* req, struct timespec* rem) {
   sylar::Fiber::ptr fiber = sylar::Fiber::GetThis();
   sylar::IOManager* iom = sylar::IOManager::GetThis();
   iom->addTimer(timeout_ms,
-                std::bind((void (sylar::Scheduler::*)(sylar::Fiber::ptr,
-                                                      int thread))&sylar::IOManager::schedule,
+                std::bind((void(sylar::Scheduler::*)(sylar::Fiber::ptr, int thread)) &
+                            sylar::IOManager::schedule,
                           iom,
                           fiber,
                           -1));
@@ -492,5 +514,4 @@ int setsockopt(int sockfd, int level, int optname, const void* optval, socklen_t
   return setsockopt_f(sockfd, level, optname, optval, optlen);
 }
 }
-
 }   // namespace sylar
