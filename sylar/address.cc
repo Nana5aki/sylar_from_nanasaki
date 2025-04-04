@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-29 23:39:37
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-03 09:12:32
+ * @LastEditTime: 2025-04-04 11:19:48
  * @FilePath: /MySylar/sylar/address.cc
  */
 #include "address.h"
@@ -495,6 +495,10 @@ sockaddr* UnixAddress::getAddr() {
   return (sockaddr*)&m_addr;
 }
 
+socklen_t UnixAddress::getAddrLen() const {
+  return m_length;
+}
+
 const sockaddr* UnixAddress::getAddr() const {
   return (sockaddr*)&m_addr;
 }
@@ -522,15 +526,15 @@ UnknownAddress::UnknownAddress(int family) {
   m_addr.sa_family = family;
 }
 
-UnknownAddress::UnknownAddress(const sockaddr &addr) {
+UnknownAddress::UnknownAddress(const sockaddr& addr) {
   m_addr = addr;
 }
 
-sockaddr *UnknownAddress::getAddr() {
-  return (sockaddr *)&m_addr;
+sockaddr* UnknownAddress::getAddr() {
+  return (sockaddr*)&m_addr;
 }
 
-const sockaddr *UnknownAddress::getAddr() const {
+const sockaddr* UnknownAddress::getAddr() const {
   return &m_addr;
 }
 
@@ -538,12 +542,12 @@ socklen_t UnknownAddress::getAddrLen() const {
   return sizeof(m_addr);
 }
 
-std::ostream &UnknownAddress::insert(std::ostream &os) const {
+std::ostream& UnknownAddress::insert(std::ostream& os) const {
   os << "[UnknownAddress family=" << m_addr.sa_family << "]";
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const Address &addr) {
+std::ostream& operator<<(std::ostream& os, const Address& addr) {
   return addr.insert(os);
 }
 

@@ -2,10 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2025-03-27 08:42:33
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-28 21:47:20
+ * @LastEditTime: 2025-04-04 10:46:11
  * @FilePath: /MySylar/tests/test_hook.cpp
  */
-#include "sylar/sylar.h"
+
+#include "sylar/config.h"
+#include "sylar/env.h"
+#include "sylar/iomanager.h"
+#include "sylar/log.h"
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/socket.h>
