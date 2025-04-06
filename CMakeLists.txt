@@ -41,6 +41,7 @@ set(LIB_SRC
     sylar/hook.cc
     sylar/fd_manager.cc
     sylar/address.cc
+    sylar/socket.cc
 )
 
 find_package(Boost REQUIRED)
@@ -72,6 +73,8 @@ if(BUILD_TEST)
     sylar_add_executable(test_timer "tests/test_timer.cpp" sylar "${LIBS}")
     sylar_add_executable(test_hook "tests/test_hook.cpp" sylar "${LIBS}")
     sylar_add_executable(test_address "tests/test_address.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_socket_tcp_client "tests/test_socket_tcp_client.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_socket_tcp_server "tests/test_socket_tcp_server.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径
