@@ -62,15 +62,24 @@ std::string BacktraceToString(int size = 64, int skip = 2, const std::string& pr
 
 class FSUtil {
 public:
-    /**
-     * @brief
-     * 递归列举指定目录下所有指定后缀的常规文件，如果不指定后缀，则遍历所有文件，返回的文件名带路径
-     * @param[out] files 文件列表
-     * @param[in] path 路径
-     * @param[in] subfix 后缀名，比如 ".yml"
-     */
-    static void ListAllFile(std::vector<std::string>& files, const std::string& path,
-                            const std::string& subfix);
+  /**
+   * @brief
+   * 递归列举指定目录下所有指定后缀的常规文件，如果不指定后缀，则遍历所有文件，返回的文件名带路径
+   * @param[out] files 文件列表
+   * @param[in] path 路径
+   * @param[in] subfix 后缀名，比如 ".yml"
+   */
+  static void ListAllFile(std::vector<std::string>& files, const std::string& path,
+                          const std::string& subfix);
+
+  /**
+   * @brief 删除文件，参考unlink(2)
+   * @param[in] filename 文件名
+   * @param[in] exist 是否存在
+   * @return  是否成功
+   * @note 内部会判断一次是否真的不存在该文件
+   */
+  static bool Unlink(const std::string& filename, bool exist = false);
 };
 
 /**
@@ -78,13 +87,13 @@ public:
  */
 template <class T>
 const char* TypeToName() {
-    // abi::__cxa_demangle 是 C++ ABI (Application Binary Interface)
-    // 中的一个函数，用于将编译器产生的 C++ 符号名还原为人类可读的形式。在 C++
-    // 中，函数名、类名等在编译过程中会被编译器改写为一种编码形式，这种形式不易阅读，而
-    // abi::__cxa_demangle可以将其还原为正常的形式，便于理解和调试。具体来说，abi::__cxa_demangle
-    // 函数的作用是将 C++ 符号名（mangled name）转换为其原始形式
-    static const char* s_name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
-    return s_name;
+  // abi::__cxa_demangle 是 C++ ABI (Application Binary Interface)
+  // 中的一个函数，用于将编译器产生的 C++ 符号名还原为人类可读的形式。在 C++
+  // 中，函数名、类名等在编译过程中会被编译器改写为一种编码形式，这种形式不易阅读，而
+  // abi::__cxa_demangle可以将其还原为正常的形式，便于理解和调试。具体来说，abi::__cxa_demangle
+  // 函数的作用是将 C++ 符号名（mangled name）转换为其原始形式
+  static const char* s_name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+  return s_name;
 }
 
 }   // namespace sylar
