@@ -42,6 +42,7 @@ set(LIB_SRC
     sylar/fd_manager.cc
     sylar/address.cc
     sylar/socket.cc
+    sylar/bytearray.cc
 )
 
 find_package(Boost REQUIRED)
@@ -75,6 +76,7 @@ if(BUILD_TEST)
     sylar_add_executable(test_address "tests/test_address.cpp" sylar "${LIBS}")
     sylar_add_executable(test_socket_tcp_client "tests/test_socket_tcp_client.cpp" sylar "${LIBS}")
     sylar_add_executable(test_socket_tcp_server "tests/test_socket_tcp_server.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_bytearray "tests/test_bytearray.cpp" sylar "${LIBS}") 
 endif()
 
 # 输出路径
