@@ -27,6 +27,9 @@ set(RDYNAMIC_FLAG "-rdynamic")
 
 include_directories(.)
 
+# 添加第三方库目录
+add_subdirectory(third_party)
+
 set(LIB_SRC
     sylar/log.cc
     sylar/mutex.cc
@@ -59,6 +62,7 @@ set(LIBS
     pthread
     dl
     yaml-cpp
+    http_parser
 )
 
 # 测试

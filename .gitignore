@@ -3,3 +3,4 @@ build/
 lib/
 .cache/
 output/
+third_party/http-parser/
