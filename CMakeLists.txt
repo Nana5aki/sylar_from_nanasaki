@@ -27,9 +27,6 @@ set(RDYNAMIC_FLAG "-rdynamic")
 
 include_directories(.)
 
-# 添加第三方库目录
-add_subdirectory(third_party)
-
 set(LIB_SRC
     sylar/log.cc
     sylar/mutex.cc
@@ -46,6 +43,7 @@ set(LIB_SRC
     sylar/address.cc
     sylar/socket.cc
     sylar/bytearray.cc
+    sylar/http/http.cc
 )
 
 find_package(Boost REQUIRED)
@@ -56,6 +54,8 @@ endif()
 add_library(sylar SHARED ${LIB_SRC})
 target_link_options(sylar PRIVATE ${RDYNAMIC_FLAG})
 force_redefine_file_macro_for_sources(sylar)
+
+include_directories(${CMAKE_SOURCE_DIR}/third_party/http-parser)
 
 set(LIBS
     sylar
