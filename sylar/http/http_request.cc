@@ -174,6 +174,7 @@ void HttpRequest::initBodyParam() {
 }
 
 void HttpRequest::initCookies() {
+  // 如果cookies已经解析过，则直接返回
   if (m_parserParamFlag & 0x4) {
     return;
   }
