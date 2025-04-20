@@ -27,23 +27,9 @@ set(RDYNAMIC_FLAG "-rdynamic")
 
 include_directories(.)
 
-set(LIB_SRC
-    sylar/log.cc
-    sylar/mutex.cc
-    sylar/env.cc
-    sylar/config.cc
-    sylar/util.cc
-    sylar/thread.cc
-    sylar/fiber.cc
-    sylar/scheduler.cc
-    sylar/timer.cc
-    sylar/iomanager.cc
-    sylar/hook.cc
-    sylar/fd_manager.cc
-    sylar/address.cc
-    sylar/socket.cc
-    sylar/bytearray.cc
-    sylar/http/http.cc
+# 自动搜索所有源文件和头文件
+file(GLOB_RECURSE LIB_SRC 
+    "sylar/*.cc"
 )
 
 find_package(Boost REQUIRED)

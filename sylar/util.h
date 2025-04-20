@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:27:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-01 22:15:14
+ * @LastEditTime: 2025-04-20 11:56:51
  * @FilePath: /MySylar/sylar/util.h
  */
 #ifndef __SYLAR_UTIL_H__
@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <string>
 #include <sys/types.h>
+#include <time.h>
 #include <vector>
 
 namespace sylar {
@@ -60,6 +61,16 @@ void Backtrace(std::vector<std::string>& bt, int size = 64, int skip = 1);
  */
 std::string BacktraceToString(int size = 64, int skip = 2, const std::string& prefix = "");
 
+/**
+ * @brief 日期时间转字符串
+ */
+std::string Time2Str(time_t ts = time(0), const std::string& format = "%Y-%m-%d %H:%M:%S");
+
+/**
+ * @brief 字符串转日期时间
+ */
+time_t Str2Time(const char* str, const char* format = "%Y-%m-%d %H:%M:%S");
+
 class FSUtil {
 public:
   /**
@@ -95,6 +106,49 @@ const char* TypeToName() {
   static const char* s_name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
   return s_name;
 }
+
+class StringUtil {
+public:
+  /**
+   * @brief url编码
+   * @param[in] str 原始字符串
+   * @param[in] space_as_plus 是否将空格编码成+号，如果为false，则空格编码成%20
+   * @return 编码后的字符串
+   */
+  static std::string UrlEncode(const std::string& str, bool space_as_plus = true);
+
+  /**
+   * @brief url解码
+   * @param[in] str url字符串
+   * @param[in] space_as_plus 是否将+号解码为空格
+   * @return 解析后的字符串
+   */
+  static std::string UrlDecode(const std::string& str, bool space_as_plus = true);
+
+  /**
+   * @brief 移除字符串首尾的指定字符串
+   * @param[] str 输入字符串
+   * @param[] delimit 待移除的字符串
+   * @return  移除后的字符串
+   */
+  static std::string Trim(const std::string& str, const std::string& delimit = " \t\r\n");
+
+  /**
+   * @brief 移除字符串首部的指定字符串
+   * @param[] str 输入字符串
+   * @param[] delimit 待移除的字符串
+   * @return  移除后的字符串
+   */
+  static std::string TrimLeft(const std::string& str, const std::string& delimit = " \t\r\n");
+
+  /**
+   * @brief 移除字符尾部的指定字符串
+   * @param[] str 输入字符串
+   * @param[] delimit 待移除的字符串
+   * @return  移除后的字符串
+   */
+  static std::string TrimRight(const std::string& str, const std::string& delimit = " \t\r\n");
+};
 
 }   // namespace sylar
 
