@@ -30,6 +30,7 @@ include_directories(.)
 # 自动搜索所有源文件和头文件
 file(GLOB_RECURSE LIB_SRC 
     "sylar/*.cc"
+    "third_party/http-parser/*.c"
 )
 
 find_package(Boost REQUIRED)
@@ -48,7 +49,6 @@ set(LIBS
     pthread
     dl
     yaml-cpp
-    http_parser
 )
 
 # 测试

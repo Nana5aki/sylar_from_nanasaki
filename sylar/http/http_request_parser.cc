@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-20 15:05:37
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 17:50:54
+ * @LastEditTime: 2025-04-25 22:47:14
  * @FilePath: /MySylar/sylar/http/http_request_parser.cc
  */
 #include "http_request_parser.h"
@@ -194,11 +194,11 @@ size_t HttpRequestParser::execute(char* data, size_t len) {
     SYLAR_LOG_DEBUG(g_logger) << "found upgrade, ignore";
     setError(HPE_UNKNOWN);
   } else if (m_parser.http_errno != 0) {
-    SYLAR_LOG_DEBUG(g_logger) << "parse request fail: "
+    SYLAR_LOG_WARN(g_logger) << "parse request fail: "
                               << http_errno_name(HTTP_PARSER_ERRNO(&m_parser));
     setError((int8_t)m_parser.http_errno);
   } else {
-    if (nparsed < len) {
+    if (nparsed < len) { // 如果解析的数据小于总数据，则将剩余数据移动到数据头部
       memmove(data, data + nparsed, (len - nparsed));
     }
   }

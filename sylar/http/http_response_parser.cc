@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-20 15:06:14
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 17:51:39
+ * @LastEditTime: 2025-04-25 22:44:36
  * @FilePath: /MySylar/sylar/http/http_response_parser.cc
  */
 #include "http_response_parser.h"
@@ -168,7 +168,7 @@ HttpResponseParser::HttpResponseParser() {
 size_t HttpResponseParser::execute(char* data, size_t len) {
   size_t nparsed = http_parser_execute(&m_parser, &s_response_settings, data, len);
   if (m_parser.http_errno != 0) {
-    SYLAR_LOG_DEBUG(g_logger) << "parse response fail: "
+    SYLAR_LOG_WARN(g_logger) << "parse response fail: "
                               << http_errno_name(HTTP_PARSER_ERRNO(&m_parser));
     setError((int8_t)m_parser.http_errno);
   } else {

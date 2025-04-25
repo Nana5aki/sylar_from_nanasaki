@@ -2,14 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2025-01-01 23:34:25
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-10 23:05:41
+ * @LastEditTime: 2025-04-25 22:56:29
  * @FilePath: /MySylar/sylar/scheduler.h
  */
 #ifndef __SYLAR_SCHEDULER_H__
 #define __SYLAR_SCHEDULER_H__
 
 #include "fiber.h"
-#include "log.h"
 #include "thread.h"
 #include <list>
 #include <memory>
