@@ -67,6 +67,8 @@ if(BUILD_TEST)
     sylar_add_executable(test_socket_tcp_client "tests/test_socket_tcp_client.cpp" sylar "${LIBS}")
     sylar_add_executable(test_socket_tcp_server "tests/test_socket_tcp_server.cpp" sylar "${LIBS}")
     sylar_add_executable(test_bytearray "tests/test_bytearray.cpp" sylar "${LIBS}") 
+    sylar_add_executable(test_http "tests/test_http.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_http_parser "tests/test_http_parser.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径
