@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:03:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 12:28:35
+ * @LastEditTime: 2025-04-29 22:54:00
  * @FilePath: /MySylar/sylar/http/http_request.cc
  */
 #include "http_request.h"
@@ -196,6 +196,10 @@ void HttpRequest::init() {
       m_close = true;
     }
   }
+}
+
+std::ostream& operator<<(std::ostream& os, const HttpRequest& req) {
+  return req.dump(os);
 }
 
 }   // namespace http

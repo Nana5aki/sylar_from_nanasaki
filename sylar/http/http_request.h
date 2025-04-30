@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:02:57
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 12:33:26
+ * @LastEditTime: 2025-04-29 22:53:49
  * @FilePath: /MySylar/sylar/http/http_request.h
  */
 #pragma once
@@ -431,6 +431,14 @@ private:
   /// 请求Cookie MAP
   MapType m_cookies;
 };
+
+/**
+ * @brief 流式输出HttpRequest
+ * @param[in, out] os 输出流
+ * @param[in] req HTTP请求
+ * @return 输出流
+ */
+std::ostream& operator<<(std::ostream& os, const HttpRequest& req);
 
 }   // namespace http
 }   // namespace sylar

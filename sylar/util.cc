@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:28:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 11:57:26
+ * @LastEditTime: 2025-04-30 01:50:09
  * @FilePath: /MySylar/sylar/util.cc
  */
 
@@ -94,6 +94,18 @@ std::string BacktraceToString(int size, int skip, const std::string& prefix) {
     ss << prefix << bt[i] << std::endl;
   }
   return ss.str();
+}
+
+uint64_t GetCurrentMS() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return tv.tv_sec * 1000ul + tv.tv_usec / 1000;
+}
+
+uint64_t GetCurrentUS() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return tv.tv_sec * 1000 * 1000ul + tv.tv_usec;
 }
 
 static int __lstat(const char* file, struct stat* st = nullptr) {

@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:27:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-20 11:56:51
+ * @LastEditTime: 2025-04-30 01:49:48
  * @FilePath: /MySylar/sylar/util.h
  */
 #ifndef __SYLAR_UTIL_H__
@@ -60,6 +60,16 @@ void Backtrace(std::vector<std::string>& bt, int size = 64, int skip = 1);
  * @param[in] prefix 栈信息前输出的内容
  */
 std::string BacktraceToString(int size = 64, int skip = 2, const std::string& prefix = "");
+
+/**
+ * @brief 获取当前时间的毫秒
+ */
+uint64_t GetCurrentMS();
+
+/**
+ * @brief 获取当前时间的微秒
+ */
+uint64_t GetCurrentUS();
 
 /**
  * @brief 日期时间转字符串
