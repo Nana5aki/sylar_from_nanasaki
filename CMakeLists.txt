@@ -69,6 +69,8 @@ if(BUILD_TEST)
     sylar_add_executable(test_bytearray "tests/test_bytearray.cpp" sylar "${LIBS}") 
     sylar_add_executable(test_http "tests/test_http.cpp" sylar "${LIBS}")
     sylar_add_executable(test_http_parser "tests/test_http_parser.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_uri "tests/test_uri.cpp" sylar "${LIBS}")
+    sylar_add_executable(test_http_connection "tests/test_http_connection.cpp" sylar "${LIBS}")
 endif()
 
 # 输出路径

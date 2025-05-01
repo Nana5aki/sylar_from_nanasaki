@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-29 00:00:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-30 21:16:10
+ * @LastEditTime: 2025-05-01 09:19:32
  * @FilePath: /MySylar/sylar/http/http_connection.cc
  */
 #include "http_connection.h"
@@ -185,6 +185,17 @@ HttpResult::ptr HttpConnection::DoRequest(HttpRequest::ptr req, Uri::ptr uri, ui
       "recv response timeout: " + addr->toString() + " timeout_ms:" + std::to_string(timeout_ms));
   }
   return std::make_shared<HttpResult>((int)HttpResult::Error::OK, rsp, "ok");
+}
+
+HttpConnectionPool::ptr HttpConnectionPool::Create(const std::string& uri, const std::string& vhost,
+                                                   uint32_t max_size, uint32_t max_alive_time,
+                                                   uint32_t max_request) {
+  Uri::ptr turi = Uri::Create(uri);
+  if (!turi) {
+    SYLAR_LOG_ERROR(g_logger) << "invalid uri=" << uri;
+  }
+  return std::make_shared<HttpConnectionPool>(
+    turi->getHost(), vhost, turi->getPort(), max_size, max_alive_time, max_request);
 }
 
 HttpConnectionPool::HttpConnectionPool(const std::string& host, const std::string& vhost,

@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-29 00:00:39
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-30 21:00:51
+ * @LastEditTime: 2025-05-01 09:04:41
  * @FilePath: /MySylar/sylar/http/http_connection.h
  */
 #pragma once
@@ -199,6 +199,10 @@ class HttpConnectionPool {
 public:
   using ptr = std::shared_ptr<HttpConnectionPool>;
   using MutexType = Mutex;
+
+  static HttpConnectionPool::ptr Create(const std::string& uri, const std::string& vhost,
+                                        uint32_t max_size, uint32_t max_alive_time,
+                                        uint32_t max_request);
 
   /**
    * @brief 构建HTTP请求池
