@@ -9,9 +9,15 @@ logs:
   appenders:
   - type: StdoutLogAppender
   - type: FileLogAppender
-    file: /root/sylar-from-scratch/system.txt
+    file: ~/Project/MySylar/output/system.txt
 - name: http
   level: debug
   appenders:
   - type: StdoutLogAppender
     pattern: "%f:%l%T%m%n"
+- name: test
+  level: info
+  appenders:
+  - type: StdoutLogAppender
+  - type: FileLogAppender
+    file: ~/Project/MySylar/output/test.txt
