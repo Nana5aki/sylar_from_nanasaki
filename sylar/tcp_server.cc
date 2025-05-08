@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-13 23:01:29
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-07 23:58:17
+ * @LastEditTime: 2025-05-08 09:05:38
  * @FilePath: /MySylar/sylar/tcp_server.cc
  */
 #include "tcp_server.h"
@@ -29,7 +29,7 @@ TcpServer::TcpServer(IOManager* io_worker, IOManager* accept_worker)
   , m_recvTimeout(g_tcp_server_read_timeout->getValue())
   , m_name("tcp_server")
   , m_type("tcp")
-  , m_isStop(false) {
+  , m_isStop(true) {
 }
 
 TcpServer::~TcpServer() {
