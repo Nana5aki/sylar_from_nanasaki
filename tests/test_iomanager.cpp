@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-02 18:16:55
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:46:26
+ * @LastEditTime: 2025-05-01 22:38:49
  * @FilePath: /MySylar/tests/test_iomanager.cpp
  */
 #include "sylar/config.h"
@@ -70,7 +70,7 @@ void test_io() {
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(1234);
-  inet_pton(AF_INET, "10.10.19.159", &servaddr.sin_addr.s_addr);
+  inet_pton(AF_INET, "127.0.0.1", &servaddr.sin_addr.s_addr);
 
   int rt = connect(sockfd, (const sockaddr*)&servaddr, sizeof(servaddr));
   if (rt != 0) {

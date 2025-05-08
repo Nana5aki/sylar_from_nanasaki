@@ -7,7 +7,6 @@
  */
 
 #include "mutex.h"
-
 #include <stdexcept>
 
 namespace sylar {

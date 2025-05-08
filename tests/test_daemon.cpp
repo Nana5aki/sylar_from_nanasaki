@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-01 12:44:00
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-01 13:01:28
+ * @LastEditTime: 2025-05-01 13:53:36
  */
 #include "sylar/daemon.h"
 #include "sylar/iomanager.h"
@@ -32,6 +32,6 @@ int server_main(int argc, char** argv) {
 int main(int argc, char** argv) {
   sylar::EnvMgr::GetInstance()->init(argc, argv);
   sylar::Config::LoadFromConfDir(sylar::EnvMgr::GetInstance()->getConfigPath());
-  
-  return sylar::start_daemon(argc, argv, server_main, false);
+
+  return sylar::start_daemon(argc, argv, server_main, true);
 }

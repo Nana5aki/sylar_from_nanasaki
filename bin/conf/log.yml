@@ -1,15 +1,16 @@
 logs:
 - name: root
-  level: info
-  appenders:
-  - type: StdoutLogAppender
-    pattern: "%d{%Y-%m-%d %H:%M:%S} %T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"
-- name: system
-  level: info
+  level: debug
   appenders:
   - type: StdoutLogAppender
   - type: FileLogAppender
-    file: ~/Project/MySylar/output/system.txt
+    file: /home/nanasaki/Project/MySylar/output/root.txt
+- name: system
+  level: debug
+  appenders:
+  - type: StdoutLogAppender
+  - type: FileLogAppender
+    file: /home/nanasaki/Project/MySylar/output/system.txt
 - name: http
   level: debug
   appenders:
@@ -18,6 +19,5 @@ logs:
 - name: test
   level: info
   appenders:
-  - type: StdoutLogAppender
   - type: FileLogAppender
-    file: ~/Project/MySylar/output/test.txt
+    file: /home/nanasaki/Project/MySylar/output/test.txt

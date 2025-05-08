@@ -2,13 +2,12 @@
  * @Author: Nana5aki
  * @Date: 2025-01-01 15:06:35
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-08 10:59:01
+ * @LastEditTime: 2025-05-01 23:17:17
  * @FilePath: /MySylar/sylar/fiber.h
  */
 #ifndef __SYLAR_FIBER_H__
 #define __SYLAR_FIBER_H__
 
-#include "thread.h"
 #include <functional>
 #include <memory>
 #include <ucontext.h>

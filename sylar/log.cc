@@ -7,6 +7,7 @@
  */
 
 #include "log.h"
+#include <stdexcept>
 
 #include "config.h"
 #include "env.h"

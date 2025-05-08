@@ -54,24 +54,13 @@ set(LIBS
 # 测试
 option(BUILD_TEST "ON for complile test" ON)
 if(BUILD_TEST)
-    sylar_add_executable(test_log "tests/test_log.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_env "tests/test_env.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_config "tests/test_config.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_thread "tests/test_thread.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_fiber "tests/test_fiber.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_scheduler "tests/test_scheduler.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_iomanager "tests/test_iomanager.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_timer "tests/test_timer.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_hook "tests/test_hook.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_address "tests/test_address.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_socket_tcp_client "tests/test_socket_tcp_client.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_socket_tcp_server "tests/test_socket_tcp_server.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_bytearray "tests/test_bytearray.cpp" sylar "${LIBS}") 
-    sylar_add_executable(test_http "tests/test_http.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_http_parser "tests/test_http_parser.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_uri "tests/test_uri.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_http_connection "tests/test_http_connection.cpp" sylar "${LIBS}")
-    sylar_add_executable(test_daemon "tests/test_daemon.cpp" sylar "${LIBS}")
+    # 自动查找所有 tests 目录下以 test_ 开头的 cpp 文件
+    file(GLOB TEST_SOURCES "tests/test_*.cpp")
+    foreach(test_src ${TEST_SOURCES})
+        # 获取文件名（不带路径和扩展名）
+        get_filename_component(test_name ${test_src} NAME_WE)
+        sylar_add_executable(${test_name} ${test_src} sylar "${LIBS}")
+    endforeach()
 endif()
 
 # 输出路径
