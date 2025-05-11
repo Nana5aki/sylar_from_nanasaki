@@ -2,12 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:28:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-30 01:50:09
+ * @LastEditTime: 2025-05-11 00:28:09
  * @FilePath: /MySylar/sylar/util.cc
  */
 
 #include "util.h"
 #include "log.h"
+#include <algorithm>
 #include <cstring>
 #include <dirent.h>
 #include <execinfo.h>   // for backtrace()
@@ -16,7 +17,6 @@
 #include <sys/syscall.h>
 #include <time.h>
 #include <unistd.h>
-
 namespace sylar {
 
 static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
@@ -108,15 +108,6 @@ uint64_t GetCurrentUS() {
   return tv.tv_sec * 1000 * 1000ul + tv.tv_usec;
 }
 
-static int __lstat(const char* file, struct stat* st = nullptr) {
-  struct stat lst;
-  int ret = lstat(file, &lst);
-  if (st) {
-    *st = lst;
-  }
-  return ret;
-}
-
 std::string Time2Str(time_t ts, const std::string& format) {
   struct tm tm;
   localtime_r(&ts, &tm);
@@ -133,48 +124,6 @@ time_t Str2Time(const char* str, const char* format) {
   }
   return mktime(&t);
 }
-
-
-void FSUtil::ListAllFile(std::vector<std::string>& files, const std::string& path,
-                         const std::string& subfix) {
-  if (access(path.c_str(), 0) != 0) {
-    return;
-  }
-  DIR* dir = opendir(path.c_str());
-  if (dir == nullptr) {
-    return;
-  }
-  struct dirent* dp = nullptr;
-  while ((dp = readdir(dir)) != nullptr) {
-    if (dp->d_type == DT_DIR) {
-      if (!strcmp(dp->d_name, ".") || !strcmp(dp->d_name, "..")) {
-        continue;
-      }
-      ListAllFile(files, path + "/" + dp->d_name, subfix);
-    } else if (dp->d_type == DT_REG) {
-      std::string filename(dp->d_name);
-      if (subfix.empty()) {
-        files.push_back(path + "/" + filename);
-      } else {
-        if (filename.size() < subfix.size()) {
-          continue;
-        }
-        if (filename.substr(filename.length() - subfix.size()) == subfix) {
-          files.push_back(path + "/" + filename);
-        }
-      }
-    }
-  }
-  closedir(dir);
-}
-
-bool FSUtil::Unlink(const std::string& filename, bool exist) {
-  if (!exist && __lstat(filename.c_str())) {
-    return true;
-  }
-  return ::unlink(filename.c_str()) == 0;
-}
-
 
 // clang-format off
 static const char uri_chars[256] = {
@@ -308,6 +257,18 @@ std::string StringUtil::TrimRight(const std::string& str, const std::string& del
     return "";
   }
   return str.substr(0, end);
+}
+
+std::string ToUpper(const std::string& name) {
+  std::string rt = name;
+  std::transform(rt.begin(), rt.end(), rt.begin(), ::toupper);
+  return rt;
+}
+
+std::string ToLower(const std::string& name) {
+  std::string rt = name;
+  std::transform(rt.begin(), rt.end(), rt.begin(), ::tolower);
+  return rt;
 }
 
 }   // namespace sylar

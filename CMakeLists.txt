@@ -49,6 +49,7 @@ set(LIBS
     pthread
     dl
     yaml-cpp
+    tinyxml2
 )
 
 # 测试

@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:27:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-30 01:49:48
+ * @LastEditTime: 2025-05-11 00:27:32
  * @FilePath: /MySylar/sylar/util.h
  */
 #ifndef __SYLAR_UTIL_H__
@@ -81,28 +81,6 @@ std::string Time2Str(time_t ts = time(0), const std::string& format = "%Y-%m-%d 
  */
 time_t Str2Time(const char* str, const char* format = "%Y-%m-%d %H:%M:%S");
 
-class FSUtil {
-public:
-  /**
-   * @brief
-   * 递归列举指定目录下所有指定后缀的常规文件，如果不指定后缀，则遍历所有文件，返回的文件名带路径
-   * @param[out] files 文件列表
-   * @param[in] path 路径
-   * @param[in] subfix 后缀名，比如 ".yml"
-   */
-  static void ListAllFile(std::vector<std::string>& files, const std::string& path,
-                          const std::string& subfix);
-
-  /**
-   * @brief 删除文件，参考unlink(2)
-   * @param[in] filename 文件名
-   * @param[in] exist 是否存在
-   * @return  是否成功
-   * @note 内部会判断一次是否真的不存在该文件
-   */
-  static bool Unlink(const std::string& filename, bool exist = false);
-};
-
 /**
  * @brief 获取T类型的类型字符串
  */
@@ -159,6 +137,10 @@ public:
    */
   static std::string TrimRight(const std::string& str, const std::string& delimit = " \t\r\n");
 };
+
+std::string ToUpper(const std::string& name);
+
+std::string ToLower(const std::string& name);
 
 }   // namespace sylar
 
