@@ -2,11 +2,11 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:04:58
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-19 20:02:12
+ * @LastEditTime: 2025-05-18 18:07:44
  * @FilePath: /MySylar/sylar/http/http_response.cc
  */
 #include "http_response.h"
-#include "sylar/util.h"
+#include "sylar/util/util.h"
 
 namespace sylar {
 namespace http {
@@ -41,7 +41,7 @@ void HttpResponse::setCookie(const std::string& key, const std::string& val, tim
   std::stringstream ss;
   ss << key << "=" << val;
   if (expired > 0) {
-    ss << ";expires=" << sylar::Time2Str(expired, "%a, %d %b %Y %H:%M:%S") << " GMT";
+    ss << ";expires=" << sylar::util::Time2Str(expired, "%a, %d %b %Y %H:%M:%S") << " GMT";
   }
   if (!domain.empty()) {
     ss << ";domain=" << domain;

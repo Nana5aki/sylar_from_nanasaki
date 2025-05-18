@@ -2,12 +2,12 @@
  * @Author: Nana5aki
  * @Date: 2025-01-12 15:10:46
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-03-08 10:56:28
+ * @LastEditTime: 2025-05-18 18:10:46
  * @FilePath: /MySylar/sylar/timer.cc
  */
 #include "timer.h"
 #include "macro.h"
-#include "util.h"
+#include "util/util.h"
 
 namespace sylar {
 
@@ -36,7 +36,7 @@ Timer::Timer(uint64_t ms, std::function<void()> cb, bool recurring, TimerManager
   , m_ms(ms)
   , m_cb(cb)
   , m_manager(manager) {
-  m_next = sylar::GetElapsedMS() + m_ms;
+  m_next = sylar::util::GetElapsedMS() + m_ms;
 }
 
 Timer::Timer(uint64_t next)
@@ -64,7 +64,7 @@ bool Timer::refresh() {
     return false;
   }
   m_manager->m_timers.erase(it);
-  m_next = sylar::GetElapsedMS() + m_ms;
+  m_next = sylar::util::GetElapsedMS() + m_ms;
   m_manager->m_timers.insert(shared_from_this());
   return true;
 }
@@ -84,7 +84,7 @@ bool Timer::reset(uint64_t ms, bool from_now) {
   m_manager->m_timers.erase(it);
   uint64_t start = 0;
   if (from_now) {
-    start = sylar::GetElapsedMS();
+    start = sylar::util::GetElapsedMS();
   } else {
     start = m_next - m_ms;
   }
@@ -95,7 +95,7 @@ bool Timer::reset(uint64_t ms, bool from_now) {
 }
 
 TimerManager::TimerManager() {
-  m_previouseTime = sylar::GetElapsedMS();
+  m_previouseTime = sylar::util::GetElapsedMS();
 }
 
 TimerManager::~TimerManager() {
@@ -128,7 +128,7 @@ uint64_t TimerManager::getNextTimer() {
   }
 
   const Timer::ptr& next = *m_timers.begin();
-  uint64_t now_ms = sylar::GetElapsedMS();
+  uint64_t now_ms = sylar::util::GetElapsedMS();
   if (now_ms >= next->m_next) {
     return 0;
   } else {
@@ -137,7 +137,7 @@ uint64_t TimerManager::getNextTimer() {
 }
 
 void TimerManager::listExpiredCb(std::vector<std::function<void()>>& cbs) {
-  uint64_t now_ms = sylar::GetElapsedMS();
+  uint64_t now_ms = sylar::util::GetElapsedMS();
   std::vector<Timer::ptr> expired;
   {
     RWMutexType::ReadLock lock(m_mutex);

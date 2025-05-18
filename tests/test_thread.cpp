@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-01-01 14:20:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:47:03
+ * @LastEditTime: 2025-05-18 18:19:57
  * @FilePath: /MySylar/tests/test_thread.cpp
  */
 #include "sylar/config.h"
@@ -10,7 +10,7 @@
 #include "sylar/log.h"
 #include "sylar/mutex.h"
 #include "sylar/thread.h"
-#include "sylar/util.h"
+#include "sylar/util/util.h"
 
 sylar::Logger::ptr g_logger = SYLAR_LOG_ROOT();
 
@@ -20,8 +20,8 @@ sylar::Mutex s_mutex;
 void func1(void* arg) {
   SYLAR_LOG_INFO(g_logger) << "name:" << sylar::Thread::GetName()
                            << " this.name:" << sylar::Thread::GetThis()->getName()
-                           << " thread name:" << sylar::GetThreadName()
-                           << " id:" << sylar::GetThreadId()
+                           << " thread name:" << sylar::util::GetThreadName()
+                           << " id:" << sylar::util::GetThreadId()
                            << " this.id:" << sylar::Thread::GetThis()->getId();
   SYLAR_LOG_INFO(g_logger) << "arg: " << *(int*)arg;
   for (int i = 0; i < 10000; i++) {

@@ -1,13 +1,13 @@
 /*
  * @Author: Nana5aki
- * @Date: 2024-11-30 16:27:59
+ * @Date: 2025-05-18 15:36:33
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-11 00:27:32
- * @FilePath: /MySylar/sylar/util.h
+ * @LastEditTime: 2025-05-18 17:58:22
+ * @FilePath: /MySylar/sylar/util/util.h
  */
-#ifndef __SYLAR_UTIL_H__
-#define __SYLAR_UTIL_H__
+#pragma once
 
+#include <boost/lexical_cast.hpp>
 #include <cxxabi.h>
 #include <stdint.h>
 #include <string>
@@ -16,6 +16,7 @@
 #include <vector>
 
 namespace sylar {
+namespace util {
 
 /**
  * @brief 获取线程id
@@ -95,54 +96,30 @@ const char* TypeToName() {
   return s_name;
 }
 
-class StringUtil {
-public:
-  /**
-   * @brief url编码
-   * @param[in] str 原始字符串
-   * @param[in] space_as_plus 是否将空格编码成+号，如果为false，则空格编码成%20
-   * @return 编码后的字符串
-   */
-  static std::string UrlEncode(const std::string& str, bool space_as_plus = true);
+template <class V, class Map, class K>
+V GetParamValue(const Map& m, const K& k, const V& def = V()) {
+  auto it = m.find(k);
+  if (it == m.end()) {
+    return def;
+  }
+  try {
+    return boost::lexical_cast<V>(it->second);
+  } catch (...) {}
+  return def;
+}
 
-  /**
-   * @brief url解码
-   * @param[in] str url字符串
-   * @param[in] space_as_plus 是否将+号解码为空格
-   * @return 解析后的字符串
-   */
-  static std::string UrlDecode(const std::string& str, bool space_as_plus = true);
+template <class V, class Map, class K>
+bool CheckGetParamValue(const Map& m, const K& k, V& v) {
+  auto it = m.find(k);
+  if (it == m.end()) {
+    return false;
+  }
+  try {
+    v = boost::lexical_cast<V>(it->second);
+    return true;
+  } catch (...) {}
+  return false;
+}
 
-  /**
-   * @brief 移除字符串首尾的指定字符串
-   * @param[] str 输入字符串
-   * @param[] delimit 待移除的字符串
-   * @return  移除后的字符串
-   */
-  static std::string Trim(const std::string& str, const std::string& delimit = " \t\r\n");
-
-  /**
-   * @brief 移除字符串首部的指定字符串
-   * @param[] str 输入字符串
-   * @param[] delimit 待移除的字符串
-   * @return  移除后的字符串
-   */
-  static std::string TrimLeft(const std::string& str, const std::string& delimit = " \t\r\n");
-
-  /**
-   * @brief 移除字符尾部的指定字符串
-   * @param[] str 输入字符串
-   * @param[] delimit 待移除的字符串
-   * @return  移除后的字符串
-   */
-  static std::string TrimRight(const std::string& str, const std::string& delimit = " \t\r\n");
-};
-
-std::string ToUpper(const std::string& name);
-
-std::string ToLower(const std::string& name);
-
+}   // namespace util
 }   // namespace sylar
-
-
-#endif

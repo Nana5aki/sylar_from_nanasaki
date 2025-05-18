@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-11 00:26:56
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-11 00:42:01
+ * @LastEditTime: 2025-05-18 17:56:54
  * @FilePath: /MySylar/sylar/util/fs_util.h
  */
 #pragma once
@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace sylar {
-namespace FSUtil {
+namespace fs_util {
 
 /**
  * @brief
@@ -36,5 +36,5 @@ bool Mkdir(const std::string& dirname);
 bool Rm(const std::string& path);
 bool Mv(const std::string& from, const std::string& to);
 
-}   // namespace FSUtil
+}   // namespace fs_util
 }   // namespace sylar

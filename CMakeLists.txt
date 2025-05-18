@@ -38,6 +38,11 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
+find_package(SQLite3 REQUIRED)
+if(SQLite3_FOUND)
+    include_directories(${SQLite3_INCLUDE_DIRS})
+endif()
+
 add_library(sylar SHARED ${LIB_SRC})
 target_link_options(sylar PRIVATE ${RDYNAMIC_FLAG})
 force_redefine_file_macro_for_sources(sylar)
@@ -50,6 +55,7 @@ set(LIBS
     dl
     yaml-cpp
     tinyxml2
+    ${SQLite3_LIBRARIES}
 )
 
 # 测试

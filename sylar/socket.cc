@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-04 11:56:28
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-06 10:46:22
+ * @LastEditTime: 2025-05-18 18:10:04
  * @FilePath: /MySylar/sylar/socket.cc
  */
 #include "socket.h"
@@ -11,7 +11,7 @@
 #include "iomanager.h"
 #include "log.h"
 #include "macro.h"
-#include "util.h"
+#include "util/fs_util.h"
 #include <netinet/tcp.h>
 
 namespace sylar {
@@ -171,7 +171,7 @@ bool Socket::bind(const Address::ptr addr) {
     if (sock->connect(uaddr)) {
       return false;
     } else {
-      sylar::FSUtil::Unlink(uaddr->getPath(), true);
+      sylar::fs_util::Unlink(uaddr->getPath(), true);
     }
   }
 

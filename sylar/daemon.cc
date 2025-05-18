@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-01 09:56:24
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-01 12:43:27
+ * @LastEditTime: 2025-05-18 17:56:03
  * @FilePath: /MySylar/sylar/daemon.cc
  */
 
@@ -19,8 +19,8 @@ static sylar::ConfigVar<uint32_t>::ptr g_daemon_restart_interval =
 std::string ProcessInfo::toString() const {
   std::stringstream ss;
   ss << "[ProcessInfo parent_id=" << parent_id << " main_id=" << main_id
-     << " parent_start_time=" << sylar::Time2Str(parent_start_time)
-     << " main_start_time=" << sylar::Time2Str(main_start_time)
+     << " parent_start_time=" << sylar::util::Time2Str(parent_start_time)
+     << " main_start_time=" << sylar::util::Time2Str(main_start_time)
      << " restart_count=" << restart_count << "]";
   return ss.str();
 }

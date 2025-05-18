@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-01-04 21:20:28
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:45:48
+ * @LastEditTime: 2025-05-18 18:19:10
  * @FilePath: /MySylar/tests/test_fiber.cpp
  */
 #include "sylar/config.h"
@@ -10,7 +10,7 @@
 #include "sylar/fiber.h"
 #include "sylar/log.h"
 #include "sylar/thread.h"
-#include "sylar/util.h"
+#include "sylar/util/util.h"
 #include <string>
 #include <vector>
 
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
   sylar::EnvMgr::GetInstance()->init(argc, argv);
   sylar::Config::LoadFromConfDir(sylar::EnvMgr::GetInstance()->getConfigPath());
 
-  sylar::SetThreadName("main_thread");
+  sylar::util::SetThreadName("main_thread");
   SYLAR_LOG_INFO(g_logger) << "main begin";
 
   std::vector<sylar::Thread::ptr> thrs;

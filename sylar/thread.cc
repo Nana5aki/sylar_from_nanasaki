@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-12-28 17:38:04
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-01-01 14:28:10
+ * @LastEditTime: 2025-05-18 18:10:30
  * @FilePath: /MySylar/sylar/thread.cc
  */
 #include "thread.h"
@@ -70,7 +70,7 @@ void* Thread::run(void* arg) {
     Thread* thread = (Thread*)arg;
     t_thread = thread;
     t_thread_name = thread->m_name;
-    thread->m_id = sylar::GetThreadId();
+    thread->m_id = sylar::util::GetThreadId();
     pthread_setname_np(pthread_self(), thread->m_name.substr(0, 15).c_str());
 
     std::function<void()> cb;

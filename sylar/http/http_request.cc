@@ -2,11 +2,11 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:03:05
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-29 22:54:00
+ * @LastEditTime: 2025-05-18 18:07:22
  * @FilePath: /MySylar/sylar/http/http_request.cc
  */
 #include "http_request.h"
-#include "sylar/util.h"
+#include "sylar/util/string_util.h"
 
 namespace sylar {
 namespace http {
@@ -140,20 +140,20 @@ void HttpRequest::initQueryParam() {
     return;
   }
 
-#define PARSE_PARAM(str, m, flag, trim)                                                     \
-  size_t pos = 0;                                                                           \
-  size_t last = 0;                                                                          \
-  std::string_view sv(str);                                                                 \
-  while ((pos = sv.find('=', last)) != std::string::npos) {                                 \
-    size_t key_end = pos;                                                                   \
-    size_t value_start = pos + 1;                                                           \
-    pos = sv.find(flag, value_start);                                                       \
-    size_t value_end = (pos == std::string::npos) ? sv.length() : pos;                      \
-    m.emplace(                                                                              \
-      StringUtil::UrlDecode(trim(std::string(sv.substr(last, key_end - last)))),            \
-      StringUtil::UrlDecode(std::string(sv.substr(value_start, value_end - value_start)))); \
-    if (pos == std::string::npos) break;                                                    \
-    last = pos + 1;                                                                         \
+#define PARSE_PARAM(str, m, flag, trim)                                                      \
+  size_t pos = 0;                                                                            \
+  size_t last = 0;                                                                           \
+  std::string_view sv(str);                                                                  \
+  while ((pos = sv.find('=', last)) != std::string::npos) {                                  \
+    size_t key_end = pos;                                                                    \
+    size_t value_start = pos + 1;                                                            \
+    pos = sv.find(flag, value_start);                                                        \
+    size_t value_end = (pos == std::string::npos) ? sv.length() : pos;                       \
+    m.emplace(                                                                               \
+      string_util::UrlDecode(trim(std::string(sv.substr(last, key_end - last)))),            \
+      string_util::UrlDecode(std::string(sv.substr(value_start, value_end - value_start)))); \
+    if (pos == std::string::npos) break;                                                     \
+    last = pos + 1;                                                                          \
   }
 
   PARSE_PARAM(m_query, m_params, '&', );
@@ -183,7 +183,7 @@ void HttpRequest::initCookies() {
     m_parserParamFlag |= 0x4;
     return;
   }
-  PARSE_PARAM(cookie, m_cookies, ';', StringUtil::Trim);
+  PARSE_PARAM(cookie, m_cookies, ';', string_util::Trim);
   m_parserParamFlag |= 0x4;
 }
 

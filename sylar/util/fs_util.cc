@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-11 00:27:02
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-11 00:42:15
+ * @LastEditTime: 2025-05-18 17:56:23
  * @FilePath: /MySylar/sylar/util/fs_util.cc
  */
 #include "fs_util.h"
@@ -14,7 +14,7 @@
 #include <vector>
 
 namespace sylar {
-namespace FSUtil {
+namespace fs_util {
 
 void ListAllFile(std::vector<std::string>& files, const std::string& path,
                  const std::string& subfix) {
@@ -134,5 +134,5 @@ bool Mv(const std::string& from, const std::string& to) {
   return rename(from.c_str(), to.c_str()) == 0;
 }
 
-}   // namespace FSUtil
+}   // namespace fs_util
 }   // namespace sylar

@@ -2,13 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2024-12-21 19:49:21
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:46:37
+ * @LastEditTime: 2025-05-18 18:19:30
  * @FilePath: /MySylar/tests/test_log.cpp
  */
 #include "sylar/config.h"
 #include "sylar/env.h"
 #include "sylar/log.h"
-#include "sylar/util.h"
+#include "sylar/util/util.h"
 #include <unistd.h>
 
 sylar::Logger::ptr g_logger = SYLAR_LOG_ROOT();   // 默认INFO级别
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   SYLAR_LOG_FMT_DEBUG(g_logger, "debug %s:%d", __FILE__, __LINE__);
 
   sleep(1);
-  sylar::SetThreadName("brand_new_thread");
+  sylar::util::SetThreadName("brand_new_thread");
 
   g_logger->setLevel(sylar::LogLevel::WARN);
   SYLAR_LOG_FATAL(g_logger) << "fatal msg";

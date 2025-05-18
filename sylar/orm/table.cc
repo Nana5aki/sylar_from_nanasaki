@@ -2,13 +2,12 @@
  * @Author: Nana5aki
  * @Date: 2025-05-08 23:56:10
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-11 12:15:09
+ * @LastEditTime: 2025-05-18 18:09:04
  * @FilePath: /MySylar/sylar/orm/table.cc
  */
 #include "table.h"
 #include "orm_utils.h"
 #include "sylar/log.h"
-#include "sylar/util.h"
 #include "sylar/util/fs_util.h"
 #include "sylar/util/string_util.h"
 #include <algorithm>
@@ -114,12 +113,12 @@ bool Table::init(const tinyxml2::XMLElement& node) {
 }
 
 std::string Table::getFilename() const {
-  return sylar::ToLower(m_name + m_subfix);
+  return sylar::string_util::ToLower(m_name + m_subfix);
 }
 
 void Table::gen(const std::string& path) {
   std::string p = path + "/" + sylar::string_util::replace(m_namespace, ".", "/");
-  sylar::FSUtil::Mkdir(p);
+  sylar::fs_util::Mkdir(p);
   gen_inc(p);
   gen_src(p);
 }

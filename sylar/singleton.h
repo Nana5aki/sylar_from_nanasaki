@@ -2,14 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:36:24
  * @LastEditors: Nana5aki
- * @LastEditTime: 2024-11-30 16:41:03
+ * @LastEditTime: 2025-05-18 17:54:27
  * @FilePath: /MySylar/sylar/singleton.h
  */
 #ifndef __SYLAR_SINGLETON_H__
 #define __SYLAR_SINGLETON_H__
 
 #include <memory>
-
 namespace sylar {
 
 /**
@@ -19,13 +18,13 @@ namespace sylar {
 template <class T>
 class Singleton {
 public:
-    /**
-     * @brief 返回单例裸指针
-     */
-    static T* GetInstance() {
-        static T v;
-        return &v;
-    }
+  /**
+   * @brief 返回单例裸指针
+   */
+  static T* GetInstance() {
+    static T v;
+    return &v;
+  }
 };
 
 /**
@@ -35,13 +34,13 @@ public:
 template <class T>
 class SingletonPtr {
 public:
-    /**
-     * @brief 返回单例智能指针
-     */
-    static std::shared_ptr<T> GetInstance() {
-        static std::shared_ptr<T> v(new T);
-        return v;
-    }
+  /**
+   * @brief 返回单例智能指针
+   */
+  static std::shared_ptr<T> GetInstance() {
+    static std::shared_ptr<T> v(new T);
+    return v;
+  }
 };
 
 }   // namespace sylar

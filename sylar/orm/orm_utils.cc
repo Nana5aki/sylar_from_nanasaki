@@ -2,11 +2,10 @@
  * @Author: Nana5aki
  * @Date: 2025-05-09 08:55:52
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-10 17:40:32
+ * @LastEditTime: 2025-05-18 18:08:25
  * @FilePath: /MySylar/sylar/orm/orm_utils.cc
  */
 #include "orm_utils.h"
-#include "sylar/util.h"
 #include "sylar/util/string_util.h"
 #include <sstream>
 
@@ -14,7 +13,7 @@ namespace sylar {
 namespace orm {
 
 std::string GetAsVariable(const std::string& v) {
-  return sylar::ToLower(v);
+  return sylar::string_util::ToLower(v);
 }
 
 std::string GetAsClassName(const std::string& v) {
@@ -49,7 +48,7 @@ std::string XmlToString(const tinyxml2::XMLNode& node) {
 
 std::string GetAsDefineMacro(const std::string& v) {
   std::string tmp = sylar::string_util::replace(v, '.', '_');
-  tmp = sylar::ToUpper(tmp);
+  tmp = sylar::string_util::ToUpper(tmp);
   return "__" + tmp + "__";
 }
 

@@ -2,13 +2,14 @@
  * @Author: Nana5aki
  * @Date: 2025-04-29 00:00:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-01 09:19:32
+ * @LastEditTime: 2025-05-18 18:05:55
  * @FilePath: /MySylar/sylar/http/http_connection.cc
  */
 #include "http_connection.h"
 #include "http_request_parser.h"
 #include "http_response_parser.h"
 #include "sylar/log.h"
+#include "sylar/util/util.h"
 #include <sstream>
 
 namespace sylar {
@@ -210,7 +211,7 @@ HttpConnectionPool::HttpConnectionPool(const std::string& host, const std::strin
 }
 
 HttpConnection::ptr HttpConnectionPool::getConnection() {
-  uint64_t now_ms = GetCurrentMS();
+  uint64_t now_ms = sylar::util::GetCurrentMS();
   std::vector<HttpConnection*> invalid_conns;
   HttpConnection* ptr = nullptr;
   MutexType::Lock lock(m_mutex);
@@ -267,7 +268,7 @@ HttpConnection::ptr HttpConnectionPool::getConnection() {
 void HttpConnectionPool::ReleasePtr(HttpConnection* ptr, HttpConnectionPool* pool) {
   ++ptr->m_request;
   if (!ptr->isConnected() ||
-      ((ptr->m_createTime + pool->m_maxAliveTime) >= sylar::GetCurrentMS()) ||
+      ((ptr->m_createTime + pool->m_maxAliveTime) >= sylar::util::GetCurrentMS()) ||
       (ptr->m_request >= pool->m_maxRequest)) {
     delete ptr;
     --pool->m_total;
