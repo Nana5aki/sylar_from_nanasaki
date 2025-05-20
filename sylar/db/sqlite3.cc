@@ -2,8 +2,9 @@
  * @Author: Nana5aki
  * @Date: 2025-05-17 20:58:51
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:00:59
+ * @LastEditTime: 2025-05-20 23:29:02
  * @FilePath: /MySylar/sylar/db/sqlite3.cc
+ * @Description: SQLite3数据库操作封装类
  */
 #include "sqlite3.h"
 #include "sylar/config.h"
@@ -14,8 +15,9 @@
 namespace sylar {
 namespace DB {
 
-static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
+static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("sqlite3");
 
+// 全局配置对象，用于存储SQLite3数据库配置信息
 static sylar::ConfigVar<std::map<std::string, std::map<std::string, std::string>>>::ptr
   g_sqlite3_dbs = sylar::Config::Lookup(
     "sqlite3.dbs", std::map<std::string, std::map<std::string, std::string>>(), "sqlite3 dbs");
@@ -29,24 +31,22 @@ SQLite3::~SQLite3() {
 }
 
 SQLite3::ptr SQLite3::Create(sqlite3* db) {
-  SQLite3::ptr rt(new SQLite3(db));
+  SQLite3::ptr rt = std::make_shared<SQLite3>(db);
   return rt;
 }
 
 SQLite3::ptr SQLite3::Create(const std::string& dbname, int flags) {
   sqlite3* db;
   if (sqlite3_open_v2(dbname.c_str(), &db, flags, nullptr) == SQLITE_OK) {
-    return SQLite3::ptr(new SQLite3(db));
+    return std::make_shared<SQLite3>(db);
   }
+  SYLAR_LOG_ERROR(g_logger) << "Failed to open database: " << dbname;
   return nullptr;
 }
 
 ITransaction::ptr SQLite3::openTransaction(bool auto_commit) {
-  ITransaction::ptr trans(new SQLite3Transaction(shared_from_this(), auto_commit));
-  if (trans->begin()) {
-    return trans;
-  }
-  return nullptr;
+  ITransaction::ptr trans = std::make_shared<SQLite3Transaction>(shared_from_this(), auto_commit);
+  return trans->begin() ? trans : nullptr;
 }
 
 int SQLite3::getErrno() {
@@ -63,6 +63,8 @@ int SQLite3::close() {
     rc = sqlite3_close(m_db);
     if (rc == SQLITE_OK) {
       m_db = nullptr;
+    } else {
+      SYLAR_LOG_ERROR(g_logger) << "Failed to close database: " << getErrStr();
     }
   }
   return rc;
@@ -454,7 +456,6 @@ SQLite3Transaction::~SQLite3Transaction() {
   }
 }
 
-
 int SQLite3Transaction::execute(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
@@ -482,6 +483,8 @@ bool SQLite3Transaction::begin() {
     int rt = m_db->execute(sql);
     if (rt == SQLITE_OK) {
       m_status = 1;
+    } else {
+      SYLAR_LOG_ERROR(g_logger) << "Failed to begin transaction: " << m_db->getErrStr();
     }
     return rt == SQLITE_OK;
   }
@@ -493,6 +496,8 @@ bool SQLite3Transaction::commit() {
     int rc = m_db->execute("COMMIT");
     if (rc == SQLITE_OK) {
       m_status = 2;
+    } else {
+      SYLAR_LOG_ERROR(g_logger) << "Failed to commit transaction: " << m_db->getErrStr();
     }
     return rc == SQLITE_OK;
   }
@@ -504,6 +509,8 @@ bool SQLite3Transaction::rollback() {
     int rc = m_db->execute("ROLLBACK");
     if (rc == SQLITE_OK) {
       m_status = 3;
+    } else {
+      SYLAR_LOG_ERROR(g_logger) << "Failed to rollback transaction: " << m_db->getErrStr();
     }
     return rc == SQLITE_OK;
   }
