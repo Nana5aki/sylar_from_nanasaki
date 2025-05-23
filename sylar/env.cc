@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 15:44:46
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:18:01
+ * @LastEditTime: 2025-05-23 21:43:50
  * @FilePath: /MySylar/sylar/env.cc
  */
 #include "env.h"
@@ -23,7 +23,10 @@ bool Env::init(int argc, char** argv) {
   // /proc/pid/exe 一个符号连接->指向进程ID为pid的进程的可执行文件
   sprintf(link, "/proc/%d/exe", getpid());
   // readlink读取符号连接的内容并将其存储在缓冲区
-  readlink(link, path, sizeof(path));
+  if (readlink(link, path, sizeof(path)) < 0) {
+    SYLAR_LOG_ERROR(g_logger) << "readlink error: " << strerror(errno);
+    return false;
+  }
   // 上面两行获得程序bin文件绝对路径
   //  /path/xxx/exe
   m_exe = path;
