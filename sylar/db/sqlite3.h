@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-17 20:58:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-19 23:58:15
+ * @LastEditTime: 2025-05-23 00:42:57
  * @FilePath: /MySylar/sylar/db/sqlite3.h
  */
 #pragma once
@@ -28,9 +28,9 @@ class SQLite3 : public IDB, public std::enable_shared_from_this<SQLite3> {
 public:
   using ptr = std::shared_ptr<SQLite3>;
   enum Flags {
-    READONLY = SQLITE_OPEN_READONLY,    ///< 只读模式
-    READWRITE = SQLITE_OPEN_READWRITE,  ///< 读写模式
-    CREATE = SQLITE_OPEN_CREATE         ///< 如果数据库不存在则创建
+    READONLY = SQLITE_OPEN_READONLY,     ///< 只读模式
+    READWRITE = SQLITE_OPEN_READWRITE,   ///< 读写模式
+    CREATE = SQLITE_OPEN_CREATE          ///< 如果数据库不存在则创建
   };
 
 public:
@@ -101,8 +101,8 @@ private:
   explicit SQLite3(sqlite3* db);
 
 private:
-  sqlite3* m_db;                    ///< sqlite3连接指针
-  uint64_t m_lastUsedTime = 0;      ///< 最后使用时间
+  sqlite3* m_db;                 ///< sqlite3连接指针
+  uint64_t m_lastUsedTime = 0;   ///< 最后使用时间
 };
 
 /**
@@ -113,7 +113,7 @@ class SQLite3Stmt : public IStmt, public std::enable_shared_from_this<SQLite3Stm
 
 public:
   using ptr = std::shared_ptr<SQLite3Stmt>;
-  enum Type { COPY = 1, REF = 2 };  ///< 绑定参数类型
+  enum Type { COPY = 1, REF = 2 };   ///< 绑定参数类型
 
 public:
   /**
@@ -130,9 +130,9 @@ public:
    * @return 执行结果
    */
   int prepare(const char* stmt);
-  
+
   ~SQLite3Stmt();
-  
+
   /**
    * @brief 完成预处理语句
    * @return 执行结果
@@ -263,8 +263,8 @@ protected:
   SQLite3Stmt(SQLite3::ptr db);
 
 protected:
-  SQLite3::ptr m_db;        ///< 数据库连接
-  sqlite3_stmt* m_stmt;     ///< 预处理语句
+  SQLite3::ptr m_db;      ///< 数据库连接
+  sqlite3_stmt* m_stmt;   ///< 预处理语句
 };
 
 /**
@@ -313,10 +313,10 @@ public:
   bool next() override;
 
 private:
-  int m_errno;              ///< 错误码
-  bool m_first;             ///< 是否为第一行
-  std::string m_errstr;     ///< 错误信息
-  SQLite3Stmt::ptr m_stmt;  ///< 预处理语句
+  int m_errno;               ///< 错误码
+  bool m_first;              ///< 是否为第一行
+  std::string m_errstr;      ///< 错误信息
+  SQLite3Stmt::ptr m_stmt;   ///< 预处理语句
 };
 
 /**
@@ -324,7 +324,7 @@ private:
  */
 class SQLite3Transaction : public ITransaction {
 public:
-  enum Type { 
+  enum Type {
     DEFERRED = 0,    ///< 延迟事务
     IMMEDIATE = 1,   ///< 立即事务
     EXCLUSIVE = 2    ///< 排他事务
@@ -357,10 +357,10 @@ public:
   int64_t getLastInsertId() override;
 
 private:
-  SQLite3::ptr m_db;        ///< 数据库连接
-  Type m_type;              ///< 事务类型
-  int8_t m_status;          ///< 事务状态
-  bool m_autoCommit;        ///< 是否自动提交
+  SQLite3::ptr m_db;   ///< 数据库连接
+  Type m_type;         ///< 事务类型
+  int8_t m_status;     ///< 事务状态
+  bool m_autoCommit;   ///< 是否自动提交
 };
 
 /**
@@ -479,13 +479,35 @@ private:
   void freeSQLite3(const std::string& name, SQLite3* m);
 
 private:
-  uint32_t m_maxConn;        ///< 最大连接数
-  MutexType m_mutex;         ///< 互斥锁
-  std::map<std::string, std::list<SQLite3*>> m_conns;  ///< 连接池
-  std::map<std::string, std::map<std::string, std::string>> m_dbDefines;  ///< 数据库定义
+  uint32_t m_maxConn;                                                      ///< 最大连接数
+  MutexType m_mutex;                                                       ///< 互斥锁
+  std::map<std::string, std::list<SQLite3*>> m_conns;                      ///< 连接池
+  std::map<std::string, std::map<std::string, std::string>> m_dbDefines;   ///< 数据库定义
 };
 
 using SQLite3Mgr = sylar::Singleton<SQLite3Manager>;
+
+namespace {
+
+template <size_t N, typename... Args>
+struct SQLite3Binder {
+  static int Bind(std::shared_ptr<SQLite3Stmt> stmt) {
+    return SQLITE_OK;
+  }
+};
+
+/**
+ * @brief 辅助函数，用于绑定参数到SQL语句
+ * @tparam Args 可变参数类型
+ * @param stmt SQL语句对象
+ * @param args 要绑定的参数
+ * @return SQLite操作结果码
+ */
+template <typename... Args>
+int bindX(SQLite3Stmt::ptr stmt, const Args&... args) {
+  return SQLite3Binder<1, Args...>::Bind(stmt, args...);
+}
+}   // namespace
 
 template <typename... Args>
 int SQLite3::execStmt(const char* stmt, Args&&... args) {
@@ -566,18 +588,6 @@ struct SQLite3Binder<N, Head, Tail...> {
     return SQLITE_OK;
   }
 };
-
-/**
- * @brief 辅助函数，用于绑定参数到SQL语句
- * @tparam Args 可变参数类型
- * @param stmt SQL语句对象
- * @param args 要绑定的参数
- * @return SQLite操作结果码
- */
-template <typename... Args>
-int bindX(SQLite3Stmt::ptr stmt, const Args&... args) {
-  return SQLite3Binder<1, Args...>::Bind(stmt, args...);
-}
 
 /**
  * @brief 用于生成基本类型特化的宏

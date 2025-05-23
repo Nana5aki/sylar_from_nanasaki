@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-17 20:58:51
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-20 23:29:02
+ * @LastEditTime: 2025-05-23 00:39:01
  * @FilePath: /MySylar/sylar/db/sqlite3.cc
  * @Description: SQLite3数据库操作封装类
  */
@@ -31,14 +31,15 @@ SQLite3::~SQLite3() {
 }
 
 SQLite3::ptr SQLite3::Create(sqlite3* db) {
-  SQLite3::ptr rt = std::make_shared<SQLite3>(db);
+  // 构造函数私有，不能使用make_shared
+  SQLite3::ptr rt(new SQLite3(db));
   return rt;
 }
 
 SQLite3::ptr SQLite3::Create(const std::string& dbname, int flags) {
   sqlite3* db;
   if (sqlite3_open_v2(dbname.c_str(), &db, flags, nullptr) == SQLITE_OK) {
-    return std::make_shared<SQLite3>(db);
+    return SQLite3::ptr(new SQLite3(db));
   }
   SYLAR_LOG_ERROR(g_logger) << "Failed to open database: " << dbname;
   return nullptr;
