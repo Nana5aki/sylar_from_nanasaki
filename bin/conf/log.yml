@@ -4,13 +4,13 @@ logs:
   appenders:
   - type: StdoutLogAppender
   - type: FileLogAppender
-    file: /home/nanasaki/Project/MySylar/output/root.txt
+    file: /home/nanasaki/Project/sylar_from_nanasaki/output/root.txt
 - name: system
   level: debug
   appenders:
   - type: StdoutLogAppender
   - type: FileLogAppender
-    file: /home/nanasaki/Project/MySylar/output/system.txt
+    file: /home/nanasaki/Project/sylar_from_nanasaki/output/system.txt
 - name: http
   level: debug
   appenders:
@@ -20,4 +20,4 @@ logs:
   level: info
   appenders:
   - type: FileLogAppender
-    file: /home/nanasaki/Project/MySylar/output/test.txt
+    file: /home/nanasaki/Project/sylar_from_nanasaki/output/test.txt

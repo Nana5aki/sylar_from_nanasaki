@@ -3,7 +3,7 @@
  * @Date: 2025-04-04 11:56:28
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-18 18:10:04
- * @FilePath: /MySylar/sylar/socket.cc
+ * @FilePath: /sylar_from_nanasaki/sylar/socket.cc
  */
 #include "socket.h"
 #include "fd_manager.h"

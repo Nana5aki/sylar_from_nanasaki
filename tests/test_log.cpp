@@ -3,7 +3,7 @@
  * @Date: 2024-12-21 19:49:21
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-18 18:19:30
- * @FilePath: /MySylar/tests/test_log.cpp
+ * @FilePath: /sylar_from_nanasaki/tests/test_log.cpp
  */
 #include "sylar/config.h"
 #include "sylar/env.h"

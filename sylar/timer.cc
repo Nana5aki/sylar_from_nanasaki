@@ -3,7 +3,7 @@
  * @Date: 2025-01-12 15:10:46
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-18 18:10:46
- * @FilePath: /MySylar/sylar/timer.cc
+ * @FilePath: /sylar_from_nanasaki/sylar/timer.cc
  */
 #include "timer.h"
 #include "macro.h"

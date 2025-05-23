@@ -3,7 +3,7 @@
  * @Date: 2025-05-18 15:36:47
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-18 18:00:00
- * @FilePath: /MySylar/sylar/util/util.cc
+ * @FilePath: /sylar_from_nanasaki/sylar/util/util.cc
  */
 #include "util.h"
 #include "sylar/log.h"

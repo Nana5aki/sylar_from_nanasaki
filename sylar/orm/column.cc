@@ -2,8 +2,8 @@
  * @Author: Nana5aki
  * @Date: 2025-05-08 23:53:20
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-10 17:58:45
- * @FilePath: /MySylar/sylar/orm/column.cc
+ * @LastEditTime: 2025-05-23 21:59:54
+ * @FilePath: /sylar_from_nanasaki/sylar/orm/column.cc
  */
 #include "column.h"
 #include "orm_utils.h"

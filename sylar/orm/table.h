@@ -3,7 +3,7 @@
  * @Date: 2025-05-08 23:55:59
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-22 00:14:29
- * @FilePath: /MySylar/sylar/orm/table.h
+ * @FilePath: /sylar_from_nanasaki/sylar/orm/table.h
  * @Description: ORM表定义类，用于生成数据库表相关的代码
  */
 #pragma once

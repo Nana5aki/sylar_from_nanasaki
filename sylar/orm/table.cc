@@ -3,7 +3,7 @@
  * @Date: 2025-05-08 23:56:10
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-22 00:20:01
- * @FilePath: /MySylar/sylar/orm/table.cc
+ * @FilePath: /sylar_from_nanasaki/sylar/orm/table.cc
  * @Description: ORM表实现类，用于生成数据库表相关的代码
  */
 #include "table.h"

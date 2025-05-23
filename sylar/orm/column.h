@@ -3,7 +3,7 @@
  * @Date: 2025-05-08 23:53:14
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-10 23:53:40
- * @FilePath: /MySylar/sylar/orm/column.h
+ * @FilePath: /sylar_from_nanasaki/sylar/orm/column.h
  */
 #pragma once
 

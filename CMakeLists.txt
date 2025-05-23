@@ -5,8 +5,8 @@ include(cmake/utils.cmake)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(CMAKE_C_COMPILE /usr/bin/clang)
-set(CMAKE_CXX_COMPILE /usr/bin/clang++)
+set(CMAKE_C_COMPILER /usr/bin/clang)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++)
 
 # -O0：关闭所有优化
 # -ggdb：启用调试信息的生成

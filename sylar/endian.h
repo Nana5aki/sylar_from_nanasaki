@@ -3,7 +3,7 @@
  * @Date: 2025-04-02 20:20:06
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-04-02 22:21:24
- * @FilePath: /MySylar/sylar/endian.h
+ * @FilePath: /sylar_from_nanasaki/sylar/endian.h
  */
 #ifndef __SYLAR_ENDIAN_H__
 #define __SYLAR_ENDIAN_H__

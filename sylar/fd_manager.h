@@ -3,7 +3,7 @@
  * @Date: 2025-03-16 11:30:08
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-03-22 12:11:32
- * @FilePath: /MySylar/sylar/fd_manager.h
+ * @FilePath: /sylar_from_nanasaki/sylar/fd_manager.h
  */
 #ifndef __SYLAR_FD_MANAGER_H__
 #define __SYLAR_FD_MANAGER_H__

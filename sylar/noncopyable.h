@@ -3,7 +3,7 @@
  * @Date: 2024-11-27 09:07:13
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-05-23 21:36:52
- * @FilePath: /MySylar/sylar/noncopyable.h
+ * @FilePath: /sylar_from_nanasaki/sylar/noncopyable.h
  */
 #ifndef __SYLAR_NONCOPYABLE_H__
 #define __SYLAR_NONCOPYABLE_H__

@@ -3,7 +3,7 @@
  * @Date: 2024-12-28 17:37:59
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-03-27 09:07:33
- * @FilePath: /MySylar/sylar/thread.h
+ * @FilePath: /sylar_from_nanasaki/sylar/thread.h
  */
 #ifndef __SYLAR_THREAD_H__
 #define __SYLAR_THREAD_H__

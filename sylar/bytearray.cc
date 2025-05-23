@@ -3,7 +3,7 @@
  * @Date: 2025-04-06 18:22:32
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-04-12 18:48:57
- * @FilePath: /MySylar/sylar/bytearray.cc
+ * @FilePath: /sylar_from_nanasaki/sylar/bytearray.cc
  */
 #include "bytearray.h"
 #include "endian.h"
