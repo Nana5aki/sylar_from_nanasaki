@@ -59,6 +59,7 @@ set(LIBS
     dl
     yaml-cpp
     tinyxml2
+    jsoncpp
     ${SQLite3_LIBRARIES}
 )
 
@@ -68,7 +69,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # ORM
 file(GLOB ORM_SRC "sylar/orm/*.cc" "sylar/orm/orm.cpp")
-sylar_add_executable(orm "${ORM_SRC}" sylar "${LIBS}")
+sylar_add_executable(gen_orm "${ORM_SRC}" sylar "${LIBS}")
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/orm_out")
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/orm_out)

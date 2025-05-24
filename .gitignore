@@ -3,3 +3,4 @@ lib/
 .cache/
 test_out/
 .idea/
+bin/

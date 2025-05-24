@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-24 11:37:18
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 12:45:08
+ * @LastEditTime: 2025-05-24 14:56:54
  * @FilePath: /sylar_from_nanasaki/sylar/orm/orm.cpp
  */
 #include "sylar/log.h"
@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   }
 
   std::string out_path = "./orm_out";
-  std::string input_path = "bin/orm_conf";
+  std::string input_path = "./orm";
   if (argc > 1) {
     input_path = argv[1];
   }

@@ -34,6 +34,9 @@ endfunction()
 # libs: 目标需要链接的库
 function(sylar_add_executable targetname srcs depends libs)
     add_executable(${targetname} ${srcs})
+    set_target_properties(${targetname} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+    )
     add_dependencies(${targetname} ${depends})
     force_redefine_file_macro_for_sources(${targetname})
     target_link_libraries(${targetname} ${libs})

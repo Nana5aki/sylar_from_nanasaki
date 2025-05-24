@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-08 23:56:10
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-22 00:20:01
+ * @LastEditTime: 2025-05-24 17:44:25
  * @FilePath: /sylar_from_nanasaki/sylar/orm/table.cc
  * @Description: ORM表实现类，用于生成数据库表相关的代码
  */
@@ -59,7 +59,9 @@ bool Table::validateRequiredAttributes(const tinyxml2::XMLElement& node) {
   }
   m_namespace = node.Attribute("namespace");
 
-  m_desc = node.Attribute("desc", "");
+  if (node.Attribute("desc")) {
+    m_desc = node.Attribute("desc");
+  }
   return true;
 }
 
@@ -197,10 +199,12 @@ void Table::gen_inc(const std::string& path) {
       return;
     }
 
+    ofs << "// clang-format off" << std::endl;
     // 生成头文件保护宏
-    std::string macro_name = GetAsDefineMacro(m_namespace + class_name + ".h");
-    ofs << "#ifndef " << macro_name << std::endl;
-    ofs << "#define " << macro_name << std::endl << std::endl;
+    // std::string macro_name = GetAsDefineMacro(m_namespace + class_name + ".h");
+    // ofs << "#ifndef " << macro_name << std::endl;
+    // ofs << "#define " << macro_name << std::endl << std::endl;
+    ofs << "#pragma once" << std::endl;
 
     // 生成包含文件
     genIncludeFiles(ofs);
@@ -217,8 +221,10 @@ void Table::gen_inc(const std::string& path) {
     // 关闭命名空间
     genNamespaces(ofs, false);
 
+    ofs << "// clang-format on" << std::endl;
+
     // 结束头文件保护宏
-    ofs << "#endif //" << macro_name << std::endl;
+    // ofs << "#endif //" << macro_name << std::endl;
   } catch (const std::exception& e) {
     SYLAR_LOG_ERROR(g_logger) << "Failed to generate header file: " << e.what();
   }
@@ -226,14 +232,14 @@ void Table::gen_inc(const std::string& path) {
 
 void Table::genIncludeFiles(std::ofstream& ofs) {
   // 系统头文件
-  const std::set<std::string> system_includes = {"vector", "json/json.h"};
+  const std::set<std::string> system_includes = {"vector", "string", "memory"};
   for (const auto& inc : system_includes) {
     ofs << "#include <" << inc << ">" << std::endl;
   }
   ofs << std::endl;
 
   // 项目头文件
-  const std::set<std::string> project_includes = {"sylar/db/db.h", "sylar/util.h"};
+  const std::set<std::string> project_includes = {"sylar/db/db.h"};
   for (const auto& inc : project_includes) {
     ofs << "#include \"" << inc << "\"" << std::endl;
   }
@@ -260,15 +266,15 @@ void Table::genClassDefinition(std::ofstream& ofs, const std::string& class_name
   ofs << "class " << GetAsClassName(class_name) << " {" << std::endl;
   ofs << "friend class " << GetAsClassName(class_name_dao) << ";" << std::endl;
   ofs << "public:" << std::endl;
-  ofs << "    typedef std::shared_ptr<" << GetAsClassName(class_name) << "> ptr;" << std::endl;
+  ofs << "  using ptr = std::shared_ptr<" << GetAsClassName(class_name) << ">;" << std::endl;
   ofs << std::endl;
-  ofs << "    " << GetAsClassName(class_name) << "();" << std::endl;
+  ofs << "  " << GetAsClassName(class_name) << "();" << std::endl;
   ofs << std::endl;
 
   // 生成getter和setter
   genGettersAndSetters(ofs);
 
-  ofs << "    " << genToStringInc() << std::endl;
+  ofs << "  " << genToStringInc() << std::endl;
   ofs << std::endl;
 
   // 生成私有成员
@@ -280,8 +286,8 @@ void Table::genClassDefinition(std::ofstream& ofs, const std::string& class_name
 
 void Table::genGettersAndSetters(std::ofstream& ofs) {
   for (const auto& col : m_cols) {
-    ofs << "    " << col->getGetFunDefine();
-    ofs << "    " << col->getSetFunDefine();
+    ofs << "  " << col->getGetFunDefine();
+    ofs << "  " << col->getSetFunDefine();
     ofs << std::endl;
   }
 }
@@ -297,7 +303,7 @@ void Table::genPrivateMembers(std::ofstream& ofs) {
   });
 
   for (const auto& col : cols) {
-    ofs << "    " << col->getMemberDefine();
+    ofs << "  " << col->getMemberDefine();
   }
 }
 
@@ -312,9 +318,13 @@ void Table::gen_src(const std::string& path) {
       return;
     }
 
+    ofs << "// clang-format off" << std::endl;
     // 生成包含文件
     ofs << "#include \"" << class_name + ".h\"" << std::endl;
     ofs << "#include \"sylar/log.h\"" << std::endl;
+    ofs << "#include \"sylar/util/util.h\"" << std::endl;
+    ofs << "#include \"sylar/util/string_util.h\"" << std::endl;
+    ofs << "#include \"json/json.h\"" << std::endl;
     ofs << std::endl;
 
     // 生成命名空间
@@ -338,6 +348,8 @@ void Table::gen_src(const std::string& path) {
 
     // 关闭命名空间
     genNamespaces(ofs, false);
+
+    ofs << "// clang-format on" << std::endl;
   } catch (const std::exception& e) {
     SYLAR_LOG_ERROR(g_logger) << "Failed to generate source file: " << e.what();
   }
@@ -345,7 +357,7 @@ void Table::gen_src(const std::string& path) {
 
 void Table::genConstructor(std::ofstream& ofs, const std::string& class_name) {
   ofs << GetAsClassName(class_name) << "::" << GetAsClassName(class_name) << "()" << std::endl;
-  ofs << "    :";
+  ofs << "  : ";
 
   auto cols = m_cols;
   std::sort(cols.begin(), cols.end(), [](const Column::ptr& a, const Column::ptr& b) {
@@ -358,7 +370,7 @@ void Table::genConstructor(std::ofstream& ofs, const std::string& class_name) {
   bool is_first = true;
   for (const auto& col : cols) {
     if (!is_first) {
-      ofs << std::endl << "    ,";
+      ofs << std::endl << "  , ";
     }
     ofs << GetAsMemberName(col->getName()) << "(" << col->getDefaultValueString() << ")";
     is_first = false;
@@ -384,20 +396,20 @@ std::string Table::genToStringInc() {
 std::string Table::genToStringSrc(const std::string& class_name) {
   std::stringstream ss;
   ss << "std::string " << GetAsClassName(class_name) << "::toJsonString() const {" << std::endl;
-  ss << "    Json::Value jvalue;" << std::endl;
+  ss << "  Json::Value jvalue;" << std::endl;
 
   for (const auto& col : m_cols) {
-    ss << "    jvalue[\"" << col->getName() << "\"] = ";
+    ss << "  jvalue[\"" << col->getName() << "\"] = ";
     if (col->getDType() == Column::TYPE_UINT64 || col->getDType() == Column::TYPE_INT64) {
       ss << "std::to_string(" << GetAsMemberName(col->getName()) << ");" << std::endl;
     } else if (col->getDType() == Column::TYPE_TIMESTAMP) {
-      ss << "sylar::Time2Str(" << GetAsMemberName(col->getName()) << ");" << std::endl;
+      ss << "sylar::util::Time2Str(" << GetAsMemberName(col->getName()) << ");" << std::endl;
     } else {
       ss << GetAsMemberName(col->getName()) << ";" << std::endl;
     }
   }
 
-  ss << "    return sylar::JsonUtil::ToString(jvalue);" << std::endl;
+  ss << "  return sylar::JsonUtil::ToString(jvalue);" << std::endl;
   ss << "}" << std::endl;
   return ss.str();
 }
@@ -405,8 +417,8 @@ std::string Table::genToStringSrc(const std::string& class_name) {
 std::string Table::genToInsertSQL(const std::string& class_name) {
   std::stringstream ss;
   ss << "std::string " << GetAsClassName(class_name) << "::toInsertSQL() const {" << std::endl;
-  ss << "    std::stringstream ss;" << std::endl;
-  ss << "    ss << \"insert into " << m_name << "(";
+  ss << "  std::stringstream ss;" << std::endl;
+  ss << "  ss << \"insert into " << m_name << "(";
   bool is_first = true;
   for (size_t i = 0; i < m_cols.size(); ++i) {
     if (m_cols[i]->isAutoIncrement()) {
@@ -425,18 +437,18 @@ std::string Table::genToInsertSQL(const std::string& class_name) {
       continue;
     }
     if (!is_first) {
-      ss << "    ss << \",\";" << std::endl;
+      ss << "  ss << \",\";" << std::endl;
     }
     if (m_cols[i]->getDType() == Column::TYPE_STRING) {
-      ss << "    ss << \"'\" << sylar::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "  ss << \"'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
-      ss << "    ss << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
+      ss << "  ss << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
     }
     is_first = true;
   }
-  ss << "    ss << \")\";" << std::endl;
-  ss << "    return ss.str();" << std::endl;
+  ss << "  ss << \")\";" << std::endl;
+  ss << "  return ss.str();" << std::endl;
   ss << "}" << std::endl;
   return ss.str();
 }
@@ -444,26 +456,26 @@ std::string Table::genToInsertSQL(const std::string& class_name) {
 std::string Table::genToUpdateSQL(const std::string& class_name) {
   std::stringstream ss;
   ss << "std::string " << GetAsClassName(class_name) << "::toUpdateSQL() const {" << std::endl;
-  ss << "    std::stringstream ss;" << std::endl;
-  ss << "    bool is_first = true;" << std::endl;
-  ss << "    ss << \"update " << m_name << " set \";" << std::endl;
+  ss << "  std::stringstream ss;" << std::endl;
+  ss << "  bool is_first = true;" << std::endl;
+  ss << "  ss << \"update " << m_name << " set \";" << std::endl;
   for (size_t i = 0; i < m_cols.size(); ++i) {
-    ss << "    if(_flags & " << (1ul << i) << "ul) {" << std::endl;
-    ss << "        if(!is_first) {" << std::endl;
-    ss << "            ss << \",\";" << std::endl;
-    ss << "        }" << std::endl;
-    ss << "        ss << \" " << m_cols[i]->getName() << " = ";
+    ss << "  if(_flags & " << (1ul << i) << "ul) {" << std::endl;
+    ss << "    if(!is_first) {" << std::endl;
+    ss << "      ss << \",\";" << std::endl;
+    ss << "    }" << std::endl;
+    ss << "    ss << \" " << m_cols[i]->getName() << " = ";
     if (m_cols[i]->getDType() == Column::TYPE_STRING) {
-      ss << "'\" << sylar::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
       ss << "\" << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
     }
-    ss << "        is_first = false;" << std::endl;
-    ss << "    }" << std::endl;
+    ss << "    is_first = false;" << std::endl;
+    ss << "  }" << std::endl;
   }
   ss << genWhere();
-  ss << "    return ss.str();" << std::endl;
+  ss << "  return ss.str();" << std::endl;
   ss << "}" << std::endl;
   return ss.str();
 }
@@ -471,26 +483,26 @@ std::string Table::genToUpdateSQL(const std::string& class_name) {
 std::string Table::genToDeleteSQL(const std::string& class_name) {
   std::stringstream ss;
   ss << "std::string " << GetAsClassName(class_name) << "::toDeleteSQL() const {" << std::endl;
-  ss << "    std::stringstream ss;" << std::endl;
-  ss << "    ss << \"delete from " << m_name << "\";" << std::endl;
+  ss << "  std::stringstream ss;" << std::endl;
+  ss << "  ss << \"delete from " << m_name << "\";" << std::endl;
   ss << genWhere();
-  ss << "    return ss.str();" << std::endl;
+  ss << "  return ss.str();" << std::endl;
   ss << "}" << std::endl;
   return ss.str();
 }
 
 std::string Table::genWhere() const {
   std::stringstream ss;
-  ss << "    ss << \" where ";
+  ss << "  ss << \" where ";
   auto pks = getPKs();
 
   for (size_t i = 0; i < pks.size(); ++i) {
     if (i) {
-      ss << "    ss << \" and ";
+      ss << "  ss << \" and ";
     }
     ss << pks[i]->getName() << " = ";
     if (pks[i]->getDType() == Column::TYPE_STRING) {
-      ss << "'\" << sylar::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
       ss << "\" << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
@@ -526,7 +538,7 @@ void Table::gen_dao_inc(std::ofstream& ofs) {
 
   ofs << "class " << GetAsClassName(class_name_dao) << " {" << std::endl;
   ofs << "public:" << std::endl;
-  ofs << "    using ptr = std::shared_ptr<" << GetAsClassName(class_name_dao) << ">;" << std::endl;
+  ofs << " using ptr = std::shared_ptr<" << GetAsClassName(class_name_dao) << ">;" << std::endl;
 
   // 生成基本CRUD操作
   genBasicCRUD(ofs, class_name);
@@ -541,17 +553,17 @@ void Table::gen_dao_inc(std::ofstream& ofs) {
 }
 
 void Table::genBasicCRUD(std::ofstream& ofs, const std::string& class_name) {
-  ofs << "    static int Update(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
+  ofs << "  static int Update(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
       << "::ptr conn);" << std::endl;
-  ofs << "    static int Insert(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
+  ofs << "  static int Insert(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
       << "::ptr conn);" << std::endl;
-  ofs << "    static int InsertOrUpdate(" << GetAsClassName(class_name) << "::ptr info, "
+  ofs << "  static int InsertOrUpdate(" << GetAsClassName(class_name) << "::ptr info, "
       << m_updateclass << "::ptr conn);" << std::endl;
-  ofs << "    static int Delete(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
+  ofs << "  static int Delete(" << GetAsClassName(class_name) << "::ptr info, " << m_updateclass
       << "::ptr conn);" << std::endl;
 
   auto pks = getPKs();
-  ofs << "    static int Delete(";
+  ofs << "  static int Delete(";
   for (const auto& pk : pks) {
     ofs << "const " << pk->getDTypeString() << "& " << GetAsVariable(pk->getName()) << ", ";
   }
@@ -568,11 +580,11 @@ void Table::genIndexOperations(std::ofstream& ofs, const std::string& class_name
   }
 
   // 生成查询操作
-  ofs << "    static int QueryAll(std::vector<" << GetAsClassName(class_name) << "::ptr>& results, "
+  ofs << "  static int QueryAll(std::vector<" << GetAsClassName(class_name) << "::ptr>& results, "
       << m_queryclass << "::ptr conn);" << std::endl;
 
   auto pks = getPKs();
-  ofs << "    static " << GetAsClassName(class_name) << "::ptr Query(";
+  ofs << "  static " << GetAsClassName(class_name) << "::ptr Query(";
   for (const auto& pk : pks) {
     ofs << "const " << pk->getDTypeString() << "& " << GetAsVariable(pk->getName()) << ", ";
   }
@@ -590,7 +602,7 @@ void Table::genIndexOperations(std::ofstream& ofs, const std::string& class_name
 
 void Table::genIndexDeleteOperation(std::ofstream& ofs, const std::string& class_name,
                                     const Index::ptr& idx) {
-  ofs << "    static int Delete";
+  ofs << "  static int Delete";
   std::string tmp = "by";
   for (const auto& col : idx->getCols()) {
     tmp += "_" + col;
@@ -605,7 +617,7 @@ void Table::genIndexDeleteOperation(std::ofstream& ofs, const std::string& class
 
 void Table::genUniqueIndexQueryOperation(std::ofstream& ofs, const std::string& class_name,
                                          const Index::ptr& idx) {
-  ofs << "    static " << GetAsClassName(class_name) << "::ptr Query";
+  ofs << "  static " << GetAsClassName(class_name) << "::ptr Query";
   std::string tmp = "by";
   for (const auto& col : idx->getCols()) {
     tmp += "_" + col;
@@ -620,7 +632,7 @@ void Table::genUniqueIndexQueryOperation(std::ofstream& ofs, const std::string& 
 
 void Table::genIndexQueryOperation(std::ofstream& ofs, const std::string& class_name,
                                    const Index::ptr& idx) {
-  ofs << "    static int Query";
+  ofs << "  static int Query";
   std::string tmp = "by";
   for (const auto& col : idx->getCols()) {
     tmp += "_" + col;
@@ -635,8 +647,8 @@ void Table::genIndexQueryOperation(std::ofstream& ofs, const std::string& class_
 }
 
 void Table::genCreateTableOperations(std::ofstream& ofs) {
-  ofs << "    static int CreateTableSQLite3(" << m_dbclass << "::ptr info);" << std::endl;
-  ofs << "    static int CreateTableMySQL(" << m_dbclass << "::ptr info);" << std::endl;
+  ofs << "  static int CreateTableSQLite3(" << m_dbclass << "::ptr info);" << std::endl;
+  ofs << "  static int CreateTableMySQL(" << m_dbclass << "::ptr info);" << std::endl;
 }
 
 void Table::gen_dao_src(std::ofstream& ofs) {
@@ -703,7 +715,7 @@ void Table::genUpdateImpl(std::ofstream& ofs, const std::string& class_name,
     is_first = false;
   }
 
-  ofs << "    std::string sql = \"" << sql.str() << "\";" << std::endl;
+  ofs << "  std::string sql = \"" << sql.str() << "\";" << std::endl;
 
   // 生成预处理语句
   genPrepareStatement(ofs, "conn->getErrno()");
@@ -714,18 +726,18 @@ void Table::genUpdateImpl(std::ofstream& ofs, const std::string& class_name,
     if (std::find(pks.begin(), pks.end(), col) != pks.end()) {
       continue;
     }
-    ofs << "    stmt->" << col->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << col->getBindString() << "(" << idx << ", ";
     ofs << "info->" << GetAsMemberName(col->getName()) << ");" << std::endl;
     ++idx;
   }
 
   for (const auto& pk : pks) {
-    ofs << "    stmt->" << pk->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << pk->getBindString() << "(" << idx << ", ";
     ofs << "info->" << GetAsMemberName(pk->getName()) << ");" << std::endl;
     ++idx;
   }
 
-  ofs << "    return stmt->execute();" << std::endl;
+  ofs << "  return stmt->execute();" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
@@ -766,7 +778,7 @@ void Table::genInsertImpl(std::ofstream& ofs, const std::string& class_name,
   }
   sql << ")";
 
-  ofs << "    std::string sql = \"" << sql.str() << "\";" << std::endl;
+  ofs << "  std::string sql = \"" << sql.str() << "\";" << std::endl;
 
   // 生成预处理语句
   genPrepareStatement(ofs, "conn->getErrno()");
@@ -777,30 +789,30 @@ void Table::genInsertImpl(std::ofstream& ofs, const std::string& class_name,
     if (col->isAutoIncrement()) {
       continue;
     }
-    ofs << "    stmt->" << col->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << col->getBindString() << "(" << idx << ", ";
     ofs << "info->" << GetAsMemberName(col->getName()) << ");" << std::endl;
     ++idx;
   }
 
-  ofs << "    int rt = stmt->execute();" << std::endl;
+  ofs << "  int rt = stmt->execute();" << std::endl;
   if (auto_inc) {
-    ofs << "    if(rt == 0) {" << std::endl;
-    ofs << "        info->" << GetAsMemberName(auto_inc->getName()) << " = conn->getLastInsertId();"
+    ofs << "  if(rt == 0) {" << std::endl;
+    ofs << "    info->" << GetAsMemberName(auto_inc->getName()) << " = conn->getLastInsertId();"
         << std::endl;
-    ofs << "    }" << std::endl;
+    ofs << "  }" << std::endl;
   }
-  ofs << "    return rt;" << std::endl;
+  ofs << "  return rt;" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
 void Table::genPrepareStatement(std::ofstream& ofs, const std::string& error_return) {
-  ofs << "    auto stmt = conn->prepare(sql);" << std::endl;
-  ofs << "    if(!stmt) {" << std::endl;
-  ofs << "        SYLAR_LOG_ERROR(g_logger) << \"stmt=\" << sql" << std::endl
-      << "                 << \" errno=\" << conn->getErrno()"
-      << " << \" errstr=\" << conn->getErrStr();" << std::endl
-      << "        return " << error_return << ";" << std::endl;
-  ofs << "    }" << std::endl;
+  ofs << "  auto stmt = conn->prepare(sql);" << std::endl;
+  ofs << "  if(!stmt) {" << std::endl;
+  ofs << "    SYLAR_LOG_ERROR(g_logger) << \"stmt=\" << sql" << std::endl
+      << "         << \" errno=\" << conn->getErrno()" << " << \" errstr=\" << conn->getErrStr();"
+      << std::endl
+      << "    return " << error_return << ";" << std::endl;
+  ofs << "  }" << std::endl;
 }
 
 void Table::genInsertOrUpdateImpl(std::ofstream& ofs, const std::string& class_name,
@@ -815,11 +827,11 @@ void Table::genInsertOrUpdateImpl(std::ofstream& ofs, const std::string& class_n
     }
   }
   if (auto_inc) {
-    ofs << "    if(info->" << GetAsMemberName(auto_inc->getName()) << " == 0) {" << std::endl;
-    ofs << "        return Insert(info, conn);" << std::endl;
-    ofs << "    }" << std::endl;
+    ofs << "  if(info->" << GetAsMemberName(auto_inc->getName()) << " == 0) {" << std::endl;
+    ofs << "    return Insert(info, conn);" << std::endl;
+    ofs << "  }" << std::endl;
   }
-  ofs << "    std::string sql = \"replace into " << m_name << " (";
+  ofs << "  std::string sql = \"replace into " << m_name << " (";
   bool is_first = true;
   for (auto& i : m_cols) {
     if (!is_first) {
@@ -844,11 +856,11 @@ void Table::genInsertOrUpdateImpl(std::ofstream& ofs, const std::string& class_n
   genPrepareStatement(ofs, "conn->getErrno()");
   int idx = 1;
   for (auto& i : m_cols) {
-    ofs << "    stmt->" << i->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << i->getBindString() << "(" << idx << ", ";
     ofs << "info->" << GetAsMemberName(i->getName()) << ");" << std::endl;
     ++idx;
   }
-  ofs << "    return stmt->execute();" << std::endl;
+  ofs << "  return stmt->execute();" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
@@ -857,7 +869,7 @@ void Table::genDeleteImpl(std::ofstream& ofs, const std::string& class_name,
   ofs << "int " << GetAsClassName(class_name_dao) << "::Delete(" << GetAsClassName(class_name)
       << "::ptr info, " << m_updateclass << "::ptr conn) {" << std::endl;
 
-  ofs << "    std::string sql = \"delete from " << m_name << " where";
+  ofs << "  std::string sql = \"delete from " << m_name << " where";
   bool is_first = true;
   auto pks = getPKs();
   for (auto& i : pks) {
@@ -871,11 +883,11 @@ void Table::genDeleteImpl(std::ofstream& ofs, const std::string& class_name,
   genPrepareStatement(ofs, "conn->getErrno()");
   int idx = 1;
   for (auto& i : pks) {
-    ofs << "    stmt->" << i->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << i->getBindString() << "(" << idx << ", ";
     ofs << "info->" << GetAsMemberName(i->getName()) << ");" << std::endl;
     ++idx;
   }
-  ofs << "    return stmt->execute();" << std::endl;
+  ofs << "  return stmt->execute();" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
@@ -895,7 +907,7 @@ void Table::genIndexDeleteImpl(std::ofstream& ofs, const std::string& class_name
         ofs << " const " << d->getDTypeString() << "& " << GetAsVariable(d->getName()) << ", ";
       }
       ofs << m_updateclass << "::ptr conn) {" << std::endl;
-      ofs << "    std::string sql = \"delete from " << m_name << " where";
+      ofs << "  std::string sql = \"delete from " << m_name << " where";
       bool is_first = true;
       for (auto& x : i->getCols()) {
         if (!is_first) {
@@ -908,10 +920,10 @@ void Table::genIndexDeleteImpl(std::ofstream& ofs, const std::string& class_name
       genPrepareStatement(ofs, "conn->getErrno()");
       int idx = 1;
       for (auto& x : i->getCols()) {
-        ofs << "    stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
+        ofs << "  stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
         ofs << GetAsVariable(x) << ");" << std::endl;
       }
-      ofs << "    return stmt->execute();" << std::endl;
+      ofs << "  return stmt->execute();" << std::endl;
       ofs << "}" << std::endl << std::endl;
     }
   }
@@ -922,7 +934,7 @@ void Table::genQueryAllImpl(std::ofstream& ofs, const std::string& class_name,
   ofs << "int " << GetAsClassName(class_name_dao) << "::QueryAll(std::vector<"
       << GetAsClassName(class_name) << "::ptr>& results, " << m_queryclass << "::ptr conn) {"
       << std::endl;
-  ofs << "    std::string sql = \"select ";
+  ofs << "  std::string sql = \"select ";
   bool is_first = true;
   for (auto& i : m_cols) {
     if (!is_first) {
@@ -933,12 +945,12 @@ void Table::genQueryAllImpl(std::ofstream& ofs, const std::string& class_name,
   }
   ofs << " from " << m_name << "\";" << std::endl;
   genPrepareStatement(ofs, "conn->getErrno()");
-  ofs << "    auto rt = stmt->query();" << std::endl;
-  ofs << "    if(!rt) {" << std::endl;
-  ofs << "        return stmt->getErrno();" << std::endl;
-  ofs << "    }" << std::endl;
-  ofs << "    while (rt->next()) {" << std::endl;
-  ofs << "        " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
+  ofs << "  auto rt = stmt->query();" << std::endl;
+  ofs << "  if(!rt) {" << std::endl;
+  ofs << "    return stmt->getErrno();" << std::endl;
+  ofs << "  }" << std::endl;
+  ofs << "  while (rt->next()) {" << std::endl;
+  ofs << "    " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
       << ");" << std::endl;
 
 #define PARSE_OBJECT(prefix)                                                       \
@@ -946,10 +958,10 @@ void Table::genQueryAllImpl(std::ofstream& ofs, const std::string& class_name,
     ofs << prefix "v->" << GetAsMemberName(m_cols[i]->getName()) << " = ";         \
     ofs << "rt->" << m_cols[i]->getGetString() << "(" << (i) << ");" << std::endl; \
   }
-  PARSE_OBJECT("        ");
-  ofs << "        results.push_back(v);" << std::endl;
-  ofs << "    }" << std::endl;
-  ofs << "    return 0;" << std::endl;
+  PARSE_OBJECT("    ");
+  ofs << "    results.push_back(v);" << std::endl;
+  ofs << "  }" << std::endl;
+  ofs << "  return 0;" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
@@ -961,7 +973,7 @@ void Table::genQueryImpl(std::ofstream& ofs, const std::string& class_name,
   }
   ofs << m_queryclass << "::ptr conn) {" << std::endl;
 
-  ofs << "    std::string sql = \"select ";
+  ofs << "  std::string sql = \"select ";
   bool is_first = true;
   for (auto& i : m_cols) {
     if (!is_first) {
@@ -984,21 +996,21 @@ void Table::genQueryImpl(std::ofstream& ofs, const std::string& class_name,
   genPrepareStatement(ofs, "nullptr");
   int idx = 1;
   for (auto& i : getPKs()) {
-    ofs << "    stmt->" << i->getBindString() << "(" << idx << ", ";
+    ofs << "  stmt->" << i->getBindString() << "(" << idx << ", ";
     ofs << GetAsVariable(i->getName()) << ");" << std::endl;
     ++idx;
   }
-  ofs << "    auto rt = stmt->query();" << std::endl;
-  ofs << "    if(!rt) {" << std::endl;
-  ofs << "        return nullptr;" << std::endl;
-  ofs << "    }" << std::endl;
-  ofs << "    if(!rt->next()) {" << std::endl;
-  ofs << "        return nullptr;" << std::endl;
-  ofs << "    }" << std::endl;
-  ofs << "    " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
-      << ");" << std::endl;
-  PARSE_OBJECT("    ");
-  ofs << "    return v;" << std::endl;
+  ofs << "  auto rt = stmt->query();" << std::endl;
+  ofs << "  if(!rt) {" << std::endl;
+  ofs << "    return nullptr;" << std::endl;
+  ofs << "  }" << std::endl;
+  ofs << "  if(!rt->next()) {" << std::endl;
+  ofs << "    return nullptr;" << std::endl;
+  ofs << "  }" << std::endl;
+  ofs << "  " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name) << ");"
+      << std::endl;
+  PARSE_OBJECT("  ");
+  ofs << "  return v;" << std::endl;
   ofs << "}" << std::endl << std::endl;
 }
 
@@ -1019,7 +1031,7 @@ void Table::genIndexQueryImpl(std::ofstream& ofs, const std::string& class_name,
       }
       ofs << m_queryclass << "::ptr conn) {" << std::endl;
 
-      ofs << "    std::string sql = \"select ";
+      ofs << "  std::string sql = \"select ";
       bool is_first = true;
       for (auto& i : m_cols) {
         if (!is_first) {
@@ -1042,21 +1054,21 @@ void Table::genIndexQueryImpl(std::ofstream& ofs, const std::string& class_name,
 
       int idx = 1;
       for (auto& x : i->getCols()) {
-        ofs << "    stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
+        ofs << "  stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
         ofs << GetAsVariable(x) << ");" << std::endl;
         ++idx;
       }
-      ofs << "    auto rt = stmt->query();" << std::endl;
-      ofs << "    if(!rt) {" << std::endl;
-      ofs << "        return nullptr;" << std::endl;
-      ofs << "    }" << std::endl;
-      ofs << "    if(!rt->next()) {" << std::endl;
-      ofs << "        return nullptr;" << std::endl;
-      ofs << "    }" << std::endl;
-      ofs << "    " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
+      ofs << "  auto rt = stmt->query();" << std::endl;
+      ofs << "  if(!rt) {" << std::endl;
+      ofs << "    return nullptr;" << std::endl;
+      ofs << "  }" << std::endl;
+      ofs << "  if(!rt->next()) {" << std::endl;
+      ofs << "    return nullptr;" << std::endl;
+      ofs << "  }" << std::endl;
+      ofs << "  " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
           << ");" << std::endl;
-      PARSE_OBJECT("    ");
-      ofs << "    return v;" << std::endl;
+      PARSE_OBJECT("  ");
+      ofs << "  return v;" << std::endl;
       ofs << "}" << std::endl << std::endl;
     } else if (i->getDType() == Index::TYPE_INDEX) {
       ofs << "int " << GetAsClassName(class_name_dao) << "::Query";
@@ -1072,7 +1084,7 @@ void Table::genIndexQueryImpl(std::ofstream& ofs, const std::string& class_name,
       }
       ofs << m_queryclass << "::ptr conn) {" << std::endl;
 
-      ofs << "    std::string sql = \"select ";
+      ofs << "  std::string sql = \"select ";
       bool is_first = true;
       for (auto& i : m_cols) {
         if (!is_first) {
@@ -1095,21 +1107,21 @@ void Table::genIndexQueryImpl(std::ofstream& ofs, const std::string& class_name,
 
       int idx = 1;
       for (auto& x : i->getCols()) {
-        ofs << "    stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
+        ofs << "  stmt->" << getCol(x)->getBindString() << "(" << idx << ", ";
         ofs << GetAsVariable(x) << ");" << std::endl;
         ++idx;
       }
-      ofs << "    auto rt = stmt->query();" << std::endl;
-      ofs << "    if(!rt) {" << std::endl;
-      ofs << "        return 0;" << std::endl;
-      ofs << "    }" << std::endl;
-      ofs << "    while (rt->next()) {" << std::endl;
-      ofs << "        " << GetAsClassName(class_name) << "::ptr v(new "
-          << GetAsClassName(class_name) << ");" << std::endl;
-      PARSE_OBJECT("        ");
-      ofs << "        results.push_back(v);" << std::endl;
-      ofs << "    };" << std::endl;
+      ofs << "  auto rt = stmt->query();" << std::endl;
+      ofs << "  if(!rt) {" << std::endl;
       ofs << "    return 0;" << std::endl;
+      ofs << "  }" << std::endl;
+      ofs << "  while (rt->next()) {" << std::endl;
+      ofs << "    " << GetAsClassName(class_name) << "::ptr v(new " << GetAsClassName(class_name)
+          << ");" << std::endl;
+      PARSE_OBJECT("    ");
+      ofs << "    results.push_back(v);" << std::endl;
+      ofs << "  };" << std::endl;
+      ofs << "  return 0;" << std::endl;
       ofs << "}" << std::endl << std::endl;
     }
   }
@@ -1118,14 +1130,14 @@ void Table::genIndexQueryImpl(std::ofstream& ofs, const std::string& class_name,
 void Table::genCreateTableImpl(std::ofstream& ofs, const std::string& class_name_dao) {
   ofs << "int " << GetAsClassName(class_name_dao) << "::CreateTableSQLite3(" << m_dbclass
       << "::ptr conn) {" << std::endl;
-  ofs << "    return conn->execute(\"CREATE TABLE " << m_name << "(\"" << std::endl;
+  ofs << "  return conn->execute(\"CREATE TABLE " << m_name << "(\"" << std::endl;
   bool is_first = true;
   bool has_auto_increment = false;
   for (auto& i : m_cols) {
     if (!is_first) {
       ofs << ",\"" << std::endl;
     }
-    ofs << "            \"" << i->getName() << " " << i->getSQLite3TypeString();
+    ofs << "      \"" << i->getName() << " " << i->getSQLite3TypeString();
     if (i->isAutoIncrement()) {
       ofs << " PRIMARY KEY AUTOINCREMENT";
       has_auto_increment = true;
@@ -1150,7 +1162,7 @@ void Table::genCreateTableImpl(std::ofstream& ofs, const std::string& class_name
     if (i->getDType() == Index::TYPE_PK) {
       continue;
     }
-    ofs << "            \"CREATE";
+    ofs << "      \"CREATE";
     if (i->getDType() == Index::TYPE_UNIQ) {
       ofs << " UNIQUE";
     }
@@ -1169,18 +1181,18 @@ void Table::genCreateTableImpl(std::ofstream& ofs, const std::string& class_name
     }
     ofs << ");\"" << std::endl;
   }
-  ofs << "            );" << std::endl;
+  ofs << "      );" << std::endl;
   ofs << "}" << std::endl << std::endl;
 
   ofs << "int " << GetAsClassName(class_name_dao) << "::CreateTableMySQL(" << m_dbclass
       << "::ptr conn) {" << std::endl;
-  ofs << "    return conn->execute(\"CREATE TABLE " << m_name << "(\"" << std::endl;
+  ofs << "  return conn->execute(\"CREATE TABLE " << m_name << "(\"" << std::endl;
   is_first = true;
   for (auto& i : m_cols) {
     if (!is_first) {
       ofs << ",\"" << std::endl;
     }
-    ofs << "            \"`" << i->getName() << "` " << i->getMySQLTypeString();
+    ofs << "      \"`" << i->getName() << "` " << i->getMySQLTypeString();
     if (i->isAutoIncrement()) {
       ofs << " AUTO_INCREMENT";
       has_auto_increment = true;
@@ -1196,7 +1208,7 @@ void Table::genCreateTableImpl(std::ofstream& ofs, const std::string& class_name
     }
     is_first = false;
   }
-  ofs << ",\"" << std::endl << "            \"PRIMARY KEY(";
+  ofs << ",\"" << std::endl << "      \"PRIMARY KEY(";
   is_first = true;
   for (auto& i : getPKs()) {
     if (!is_first) {
@@ -1211,9 +1223,9 @@ void Table::genCreateTableImpl(std::ofstream& ofs, const std::string& class_name
     }
     ofs << ",\"" << std::endl;
     if (i->getDType() == Index::TYPE_UNIQ) {
-      ofs << "            \"UNIQUE ";
+      ofs << "      \"UNIQUE ";
     } else {
-      ofs << "            \"";
+      ofs << "      \"";
     }
     ofs << "KEY `" << m_name;
     for (auto& x : i->getCols()) {
