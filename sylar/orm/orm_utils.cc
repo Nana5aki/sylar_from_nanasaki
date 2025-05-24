@@ -13,11 +13,11 @@ namespace sylar {
 namespace orm {
 
 std::string GetAsVariable(const std::string& v) {
-  return sylar::string_util::ToLower(v);
+  return sylar::StrUtil::ToLower(v);
 }
 
 std::string GetAsClassName(const std::string& v) {
-  auto vs = sylar::string_util::split(v, '_');
+  auto vs = sylar::StrUtil::split(v, '_');
   std::stringstream ss;
   for (auto& i : vs) {
     i[0] = toupper(i[0]);
@@ -47,8 +47,8 @@ std::string XmlToString(const tinyxml2::XMLNode& node) {
 }
 
 std::string GetAsDefineMacro(const std::string& v) {
-  std::string tmp = sylar::string_util::replace(v, '.', '_');
-  tmp = sylar::string_util::ToUpper(tmp);
+  std::string tmp = sylar::StrUtil::replace(v, '.', '_');
+  tmp = sylar::StrUtil::ToUpper(tmp);
   return "__" + tmp + "__";
 }
 

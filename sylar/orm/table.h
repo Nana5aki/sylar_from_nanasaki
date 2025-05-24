@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-08 23:55:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 16:56:10
+ * @LastEditTime: 2025-05-24 23:06:53
  * @FilePath: /sylar_from_nanasaki/sylar/orm/table.h
  * @Description: ORM表定义类，用于生成数据库表相关的代码
  */
@@ -215,7 +215,7 @@ private:
   std::string m_namespace;                        ///< 命名空间
   std::string m_desc;                             ///< 表描述
   std::string m_subfix = "_info";                 ///< 类名后缀
-  DBType m_type = TYPE_SQLITE3;                   ///< 数据库类型
+  // DBType m_type = TYPE_SQLITE3;                   ///< 数据库类型
   std::string m_dbclass = "sylar::DB::IDB";           ///< 数据库类名
   std::string m_queryclass = "sylar::DB::IDB";    ///< 查询类名
   std::string m_updateclass = "sylar::DB::IDB";   ///< 更新类名

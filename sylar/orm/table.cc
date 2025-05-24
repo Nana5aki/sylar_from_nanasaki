@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-08 23:56:10
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 17:44:25
+ * @LastEditTime: 2025-05-25 00:41:05
  * @FilePath: /sylar_from_nanasaki/sylar/orm/table.cc
  * @Description: ORM表实现类，用于生成数据库表相关的代码
  */
@@ -22,10 +22,10 @@ namespace orm {
 static Logger::ptr g_logger = SYLAR_LOG_NAME("orm");
 
 // 常量定义
-constexpr const char* COLUMN_TAG = "column";
-constexpr const char* COLUMNS_TAG = "columns";
-constexpr const char* INDEX_TAG = "index";
-constexpr const char* INDEXS_TAG = "indexs";
+static constexpr const char* COLUMN_TAG = "column";
+static constexpr const char* COLUMNS_TAG = "columns";
+static constexpr const char* INDEX_TAG = "index";
+static constexpr const char* INDEXS_TAG = "indexs";
 
 bool Table::init(const tinyxml2::XMLElement& node) {
   // 验证必要的属性
@@ -170,13 +170,13 @@ bool Table::validateIndexColumns(const Index::ptr& idx) {
 }
 
 std::string Table::getFilename() const {
-  return sylar::string_util::ToLower(m_name + m_subfix);
+  return sylar::StrUtil::ToLower(m_name + m_subfix);
 }
 
 void Table::gen(const std::string& path) {
   try {
-    std::string p = path + "/" + sylar::string_util::replace(m_namespace, ".", "/");
-    if (!sylar::fs_util::Mkdir(p)) {
+    std::string p = path + "/" + sylar::StrUtil::replace(m_namespace, ".", "/");
+    if (!sylar::FSUtil::Mkdir(p)) {
       SYLAR_LOG_ERROR(g_logger) << "Failed to create directory: " << p;
       return;
     }
@@ -247,7 +247,7 @@ void Table::genIncludeFiles(std::ofstream& ofs) {
 }
 
 void Table::genNamespaces(std::ofstream& ofs, bool open) {
-  std::vector<std::string> ns = sylar::string_util::split(m_namespace, '.');
+  std::vector<std::string> ns = sylar::StrUtil::split(m_namespace, '.');
   if (open) {
     for (const auto& n : ns) {
       ofs << "namespace " << n << " {" << std::endl;
@@ -324,6 +324,7 @@ void Table::gen_src(const std::string& path) {
     ofs << "#include \"sylar/log.h\"" << std::endl;
     ofs << "#include \"sylar/util/util.h\"" << std::endl;
     ofs << "#include \"sylar/util/string_util.h\"" << std::endl;
+    ofs << "#include \"sylar/util/json_util.h\"" << std::endl;
     ofs << "#include \"json/json.h\"" << std::endl;
     ofs << std::endl;
 
@@ -399,7 +400,12 @@ std::string Table::genToStringSrc(const std::string& class_name) {
   ss << "  Json::Value jvalue;" << std::endl;
 
   for (const auto& col : m_cols) {
-    ss << "  jvalue[\"" << col->getName() << "\"] = ";
+    ss << "  static const Json::StaticString " << GetAsMemberName(col->getName()) << "_key(\""
+       << col->getName() << "\");" << std::endl;
+  }
+
+  for (const auto& col : m_cols) {
+    ss << "  jvalue[" << GetAsMemberName(col->getName()) << "_key] = ";
     if (col->getDType() == Column::TYPE_UINT64 || col->getDType() == Column::TYPE_INT64) {
       ss << "std::to_string(" << GetAsMemberName(col->getName()) << ");" << std::endl;
     } else if (col->getDType() == Column::TYPE_TIMESTAMP) {
@@ -440,7 +446,7 @@ std::string Table::genToInsertSQL(const std::string& class_name) {
       ss << "  ss << \",\";" << std::endl;
     }
     if (m_cols[i]->getDType() == Column::TYPE_STRING) {
-      ss << "  ss << \"'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "  ss << \"'\" << sylar::StrUtil::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
       ss << "  ss << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
@@ -466,7 +472,7 @@ std::string Table::genToUpdateSQL(const std::string& class_name) {
     ss << "    }" << std::endl;
     ss << "    ss << \" " << m_cols[i]->getName() << " = ";
     if (m_cols[i]->getDType() == Column::TYPE_STRING) {
-      ss << "'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "'\" << sylar::StrUtil::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
       ss << "\" << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;
@@ -502,7 +508,7 @@ std::string Table::genWhere() const {
     }
     ss << pks[i]->getName() << " = ";
     if (pks[i]->getDType() == Column::TYPE_STRING) {
-      ss << "'\" << sylar::string_util::replace(" << GetAsMemberName(m_cols[i]->getName())
+      ss << "'\" << sylar::StrUtil::replace(" << GetAsMemberName(m_cols[i]->getName())
          << ", \"'\", \"''\") << \"'\";" << std::endl;
     } else {
       ss << "\" << " << GetAsMemberName(m_cols[i]->getName()) << ";" << std::endl;

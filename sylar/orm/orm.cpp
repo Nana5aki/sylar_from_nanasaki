@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-24 11:37:18
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 14:56:54
+ * @LastEditTime: 2025-05-24 21:19:46
  * @FilePath: /sylar_from_nanasaki/sylar/orm/orm.cpp
  */
 #include "sylar/log.h"
@@ -23,14 +23,13 @@ void gen_cmake(const std::string& path, const std::map<std::string, sylar::orm::
   ofs << std::endl;
   ofs << "set(LIB_SRC" << std::endl;
   for (auto& i : tbs) {
-    ofs << "    " << sylar::string_util::replace(i.second->getNamespace(), ".", "/") << "/"
-        << sylar::string_util::ToLower(i.second->getFilename()) << ".cc" << std::endl;
+    ofs << "    " << sylar::StrUtil::replace(i.second->getNamespace(), ".", "/") << "/"
+        << sylar::StrUtil::ToLower(i.second->getFilename()) << ".cc" << std::endl;
   }
   ofs << ")" << std::endl;
   ofs << "add_library(orm_data ${LIB_SRC})" << std::endl;
   ofs << "force_redefine_file_macro_for_sources(orm_data)" << std::endl;
 }
-
 
 int main(int argc, char** argv) {
   if (argc < 2) {
@@ -46,7 +45,7 @@ int main(int argc, char** argv) {
     out_path = argv[2];
   }
   std::vector<std::string> files;
-  sylar::fs_util::ListAllFile(files, input_path, ".xml");
+  sylar::FSUtil::ListAllFile(files, input_path, ".xml");
   std::vector<sylar::orm::Table::ptr> tbs;
   bool has_error = false;
   for (auto& i : files) {

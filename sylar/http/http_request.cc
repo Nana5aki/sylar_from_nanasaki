@@ -150,8 +150,8 @@ void HttpRequest::initQueryParam() {
     pos = sv.find(flag, value_start);                                                        \
     size_t value_end = (pos == std::string::npos) ? sv.length() : pos;                       \
     m.emplace(                                                                               \
-      string_util::UrlDecode(trim(std::string(sv.substr(last, key_end - last)))),            \
-      string_util::UrlDecode(std::string(sv.substr(value_start, value_end - value_start)))); \
+      StrUtil::UrlDecode(trim(std::string(sv.substr(last, key_end - last)))),            \
+      StrUtil::UrlDecode(std::string(sv.substr(value_start, value_end - value_start)))); \
     if (pos == std::string::npos) break;                                                     \
     last = pos + 1;                                                                          \
   }
@@ -183,7 +183,7 @@ void HttpRequest::initCookies() {
     m_parserParamFlag |= 0x4;
     return;
   }
-  PARSE_PARAM(cookie, m_cookies, ';', string_util::Trim);
+  PARSE_PARAM(cookie, m_cookies, ';', StrUtil::Trim);
   m_parserParamFlag |= 0x4;
 }
 

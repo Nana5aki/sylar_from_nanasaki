@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-10 15:30:38
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:00:06
+ * @LastEditTime: 2025-05-24 19:40:51
  * @FilePath: /sylar_from_nanasaki/sylar/util/string_util.cc
  */
 #include "string_util.h"
@@ -10,7 +10,7 @@
 #include <sstream>
 #include <cstdint>
 namespace sylar {
-namespace string_util {
+namespace StrUtil {
 
 std::vector<std::string> split(const std::string& str, char delim, size_t max) {
   if (str.empty()) {

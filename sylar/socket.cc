@@ -171,7 +171,7 @@ bool Socket::bind(const Address::ptr addr) {
     if (sock->connect(uaddr)) {
       return false;
     } else {
-      sylar::fs_util::Unlink(uaddr->getPath(), true);
+      sylar::FSUtil::Unlink(uaddr->getPath(), true);
     }
   }
 

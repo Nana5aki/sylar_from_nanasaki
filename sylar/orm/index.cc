@@ -61,7 +61,7 @@ bool Index::init(const tinyxml2::XMLElement& node) {
     SYLAR_LOG_ERROR(g_logger) << "index name=" << m_name << " cols is null";
   }
   std::string tmp = node.Attribute("cols");
-  m_cols = sylar::string_util::split(tmp, ',');
+  m_cols = sylar::StrUtil::split(tmp, ',');
 
   if (node.Attribute("desc")) {
     m_desc = node.Attribute("desc");

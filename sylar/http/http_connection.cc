@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-29 00:00:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 00:37:57
+ * @LastEditTime: 2025-05-24 22:14:47
  * @FilePath: /sylar_from_nanasaki/sylar/http/http_connection.cc
  */
 #include "http_connection.h"
@@ -252,7 +252,7 @@ HttpConnection::ptr HttpConnectionPool::getConnection() {
       return nullptr;
     }
 
-    if (m_total >= m_maxSize) {
+    if ((uint32_t)m_total >= m_maxSize) {
       SYLAR_LOG_ERROR(g_logger) << "ip=" << addr->toString() << " total=" << m_total
                                 << " max_size=" << m_maxSize << " over max_size";
       return nullptr;

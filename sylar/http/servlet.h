@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-27 22:23:36
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-28 00:17:39
+ * @LastEditTime: 2025-05-24 22:16:00
  * @FilePath: /sylar_from_nanasaki/sylar/http/servlet.h
  */
 
@@ -12,8 +12,10 @@
 #include "http_response.h"
 #include "http_session.h"
 #include "sylar/mutex.h"
+#include "sylar/util/util.h"
 #include <memory>
 #include <string>
+
 
 namespace sylar {
 namespace http {
@@ -120,7 +122,7 @@ public:
   }
 
   std::string getName() const override {
-    return TypeToName<T>();
+    return sylar::util::TypeToName<T>();
   }
 };
 

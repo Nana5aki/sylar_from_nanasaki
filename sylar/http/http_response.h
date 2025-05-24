@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:04:48
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-19 20:01:17
+ * @LastEditTime: 2025-05-24 23:28:44
  * @FilePath: /sylar_from_nanasaki/sylar/http/http_response.h
  */
 #pragma once
@@ -11,6 +11,8 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
+
 namespace sylar {
 namespace http {
 class HttpResponse {

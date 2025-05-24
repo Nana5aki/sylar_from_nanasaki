@@ -4,3 +4,6 @@ lib/
 test_out/
 .idea/
 bin/
+third_party/yaml-cpp/
+third_party/tinyxml2/
+third_party/jsoncpp/

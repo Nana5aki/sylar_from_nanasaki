@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-18 15:36:47
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:00:00
+ * @LastEditTime: 2025-05-25 00:25:54
  * @FilePath: /sylar_from_nanasaki/sylar/util/util.cc
  */
 #include "util.h"
@@ -13,9 +13,9 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
-
 
 namespace sylar {
 namespace util {

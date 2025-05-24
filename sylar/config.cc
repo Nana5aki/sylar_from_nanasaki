@@ -68,7 +68,7 @@ static sylar::Mutex s_mutex;
 void Config::LoadFromConfDir(const std::string& path, bool force) {
   std::string absoulte_path = sylar::EnvMgr::GetInstance()->getAbsolutePath(path);
   std::vector<std::string> files;
-  fs_util::ListAllFile(files, absoulte_path, ".yml");
+  FSUtil::ListAllFile(files, absoulte_path, ".yml");
 
   for (auto& i : files) {
     {
