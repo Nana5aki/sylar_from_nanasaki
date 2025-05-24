@@ -466,7 +466,7 @@ public:
 /**
  * @brief 输出到文件
  */
-class FileLogAppender : public LogAppender {
+class FileLogAppender final : public LogAppender {
 public:
   using ptr = std::shared_ptr<FileLogAppender>;
 
@@ -474,7 +474,7 @@ public:
    * @brief 构造函数
    * @param[in] file 日志文件路径
    */
-  FileLogAppender(const std::string& file);
+  explicit FileLogAppender(const std::string& file);
 
   /**
    * @brief 写日志
@@ -516,7 +516,7 @@ public:
    * @brief 构造函数
    * @param[in] name 日志器名称
    */
-  Logger(const std::string& name = "default");
+  explicit Logger(const std::string& name = "default");
 
   /**
    * @brief 获取日志器名称
@@ -535,7 +535,7 @@ public:
   /**
    * @brief 设置日志级别
    */
-  void setLevel(LogLevel::Level level) {
+  void setLevel(const LogLevel::Level level) {
     m_level = level;
   }
 

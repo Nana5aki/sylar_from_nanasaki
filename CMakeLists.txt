@@ -28,8 +28,12 @@ set(RDYNAMIC_FLAG "-rdynamic")
 include_directories(.)
 
 # 自动搜索所有源文件和头文件
-file(GLOB_RECURSE LIB_SRC 
+file(GLOB LIB_SRC
     "sylar/*.cc"
+    "sylar/db/*.cc"
+    "sylar/http/*.cc"
+    "sylar/util/*.cc"
+    "sylar/streams/*.cc"
     "third_party/http-parser/*.c"
 )
 
@@ -58,18 +62,34 @@ set(LIBS
     ${SQLite3_LIBRARIES}
 )
 
+# 输出路径
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
+# ORM
+file(GLOB ORM_SRC "sylar/orm/*.cc" "sylar/orm/orm.cpp")
+sylar_add_executable(orm "${ORM_SRC}" sylar "${LIBS}")
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/orm_out")
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/orm_out)
+    set(ORM_EXIST 1)
+endif()
+
 # 测试
 option(BUILD_TEST "ON for complile test" ON)
 if(BUILD_TEST)
+    set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/test_out)
     # 自动查找所有 tests 目录下以 test_ 开头的 cpp 文件
     file(GLOB TEST_SOURCES "tests/test_*.cpp")
     foreach(test_src ${TEST_SOURCES})
         # 获取文件名（不带路径和扩展名）
         get_filename_component(test_name ${test_src} NAME_WE)
+
+        if("${test_name}" STREQUAL "test_orm" AND "${ORM_EXIST}" STREQUAL "1")
+            # sylar_add_executable(${test_name} ${test_src} sylar "${LIBS}")
+            continue()
+        endif()
+
         sylar_add_executable(${test_name} ${test_src} sylar "${LIBS}")
     endforeach()
 endif()
-
-# 输出路径
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/output)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

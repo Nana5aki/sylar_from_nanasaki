@@ -1,0 +1,9 @@
+{
+    "clangd.enable": true,
+    "clangd.arguments": [
+        "--header-insertion=never",
+        "--completion-style=detailed",
+        "--function-arg-placeholders",
+        "--fallback-style=Google"
+    ]
+}

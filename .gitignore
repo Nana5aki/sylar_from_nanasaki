@@ -1,5 +1,5 @@
 build/
-.vscode/
 lib/
 .cache/
-output/
+test_out/
+.idea/

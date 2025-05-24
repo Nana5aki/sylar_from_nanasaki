@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-12-21 19:49:32
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:44:30
+ * @LastEditTime: 2025-05-24 11:14:32
  * @FilePath: /sylar_from_nanasaki/tests/test_config.cpp
  */
 #include "sylar/config.h"
@@ -45,7 +45,7 @@ sylar::ConfigVar<std::unordered_map<std::string, int>>::ptr g_unordered_map_stri
 // 自定义配置
 class Person {
 public:
-  Person() {};
+  Person(){};
   std::string m_name;
   int m_age = 0;
   bool m_sex = 0;
