@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:26:01
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:04:36
+ * @LastEditTime: 2025-05-31 11:53:53
  * @FilePath: /sylar_from_nanasaki/sylar/config.h
  */
 #ifndef __SYLAR_CONFIG_H__
@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <unordered_set>
 #include <yaml-cpp/yaml.h>
+#include <functional>
 
 
 namespace sylar {

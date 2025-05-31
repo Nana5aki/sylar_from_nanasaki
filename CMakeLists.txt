@@ -13,6 +13,9 @@ include(cmake/utils.cmake)
 
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
+set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Disable JsonCpp test compilation" FORCE)
+set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Disable JsonCpp post-build tests" FORCE)
+
 add_subdirectory(third_party/yaml-cpp)
 add_subdirectory(third_party/tinyxml2)
 add_subdirectory(third_party/jsoncpp)

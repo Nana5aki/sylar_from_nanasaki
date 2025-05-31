@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-24 11:37:18
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 21:19:46
+ * @LastEditTime: 2025-05-31 11:50:45
  * @FilePath: /sylar_from_nanasaki/sylar/orm/orm.cpp
  */
 #include "sylar/log.h"
@@ -18,7 +18,7 @@ static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("orm");
 
 void gen_cmake(const std::string& path, const std::map<std::string, sylar::orm::Table::ptr>& tbs) {
   std::ofstream ofs(path + "/CMakeLists.txt");
-  ofs << "cmake_minimum_required(VERSION 3.0)" << std::endl;
+  ofs << "cmake_minimum_required(VERSION 3.5)" << std::endl;
   ofs << "project(orm_data)" << std::endl;
   ofs << std::endl;
   ofs << "set(LIB_SRC" << std::endl;

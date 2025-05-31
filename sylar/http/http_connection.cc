@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-29 00:00:44
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 22:14:47
+ * @LastEditTime: 2025-05-31 11:54:49
  * @FilePath: /sylar_from_nanasaki/sylar/http/http_connection.cc
  */
 #include "http_connection.h"
@@ -11,6 +11,7 @@
 #include "sylar/log.h"
 #include "sylar/util/util.h"
 #include <sstream>
+#include <functional>
 
 namespace sylar {
 namespace http {

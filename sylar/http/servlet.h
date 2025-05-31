@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-27 22:23:36
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-24 22:16:00
+ * @LastEditTime: 2025-05-31 11:55:06
  * @FilePath: /sylar_from_nanasaki/sylar/http/servlet.h
  */
 
@@ -15,6 +15,8 @@
 #include "sylar/util/util.h"
 #include <memory>
 #include <string>
+#include <functional>
+#include <unordered_map>
 
 
 namespace sylar {
