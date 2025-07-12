@@ -50,6 +50,7 @@ file(GLOB LIB_SRC
     "sylar/*.cc"
     "sylar/db/*.cc"
     "sylar/http/*.cc"
+    "sylar/https/*.cc"
     "sylar/util/*.cc"
     "sylar/streams/*.cc"
     "third_party/http-parser/*.c"
@@ -65,6 +66,11 @@ if(SQLite3_FOUND)
     include_directories(${SQLite3_INCLUDE_DIRS})
 endif()
 
+find_package(OpenSSL REQUIRED)
+if(OpenSSL_FOUND)
+    include_directories(${OpenSSL_INCLUDE_DIRS})
+endif()
+
 add_library(sylar SHARED ${LIB_SRC})
 target_link_options(sylar PRIVATE ${RDYNAMIC_FLAG})
 force_redefine_file_macro_for_sources(sylar)
@@ -77,6 +83,7 @@ set(LIBS
     tinyxml2
     jsoncpp
     ${SQLite3_LIBRARIES}
+    ${OpenSSL_LIBRARIES}
 )
 
 # 输出路径

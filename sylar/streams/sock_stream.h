@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-13 14:46:16
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-13 15:09:40
+ * @LastEditTime: 2025-07-12 17:19:48
  * @FilePath: /sylar_from_nanasaki/sylar/streams/sock_stream.h
  */
 #ifndef __SYLAR_SOCKET_STREAM_H__
@@ -29,7 +29,7 @@ public:
    * @brief 析构函数
    * @details 如果m_owner=true,则close
    */
-  ~SocketStream();
+  virtual ~SocketStream();
 
   /**
    * @brief 读取数据
