@@ -50,7 +50,7 @@ file(GLOB LIB_SRC
     "sylar/*.cc"
     "sylar/db/*.cc"
     "sylar/http/*.cc"
-    "sylar/https/*.cc"
+    # "sylar/https/*.cc"
     "sylar/util/*.cc"
     "sylar/streams/*.cc"
     "third_party/http-parser/*.c"

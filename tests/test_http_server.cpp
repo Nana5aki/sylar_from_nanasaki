@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-01 19:02:36
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-07 23:39:39
+ * @LastEditTime: 2025-07-13 16:55:11
  * @FilePath: /sylar_from_nanasaki/tests/test_http_server.cpp
  */
 #include "sylar/config.h"
@@ -31,7 +31,7 @@ void run() {
   sd->addServlet("/sylar/xx",
                  [](sylar::http::HttpRequest::ptr req,
                     sylar::http::HttpResponse::ptr rsp,
-                    sylar::http::HttpSession::ptr session) {
+                    sylar::http::IHttpSession::ptr session) {
                    rsp->setBody(req->toString());
                    return 0;
                  });
@@ -39,16 +39,16 @@ void run() {
   sd->addGlobServlet("/sylar/*",
                      [](sylar::http::HttpRequest::ptr req,
                         sylar::http::HttpResponse::ptr rsp,
-                        sylar::http::HttpSession::ptr session) {
+                        sylar::http::IHttpSession::ptr) {
                        rsp->setBody("Glob:\r\n" + req->toString());
                        return 0;
                      });
 
   sd->addGlobServlet(
     "/sylarx/*",
-    [](sylar::http::HttpRequest::ptr req,
+    [](sylar::http::HttpRequest::ptr,
        sylar::http::HttpResponse::ptr rsp,
-       sylar::http::HttpSession::ptr session) {
+       sylar::http::IHttpSession::ptr) {
       rsp->setBody(XX(<html><head> < title > 404 Not Found</ title></ head><body><center> < h1 >
                         404 Not Found</ h1></ center><hr><center> nginx / 1.16.0 < / center >
                         </ body></ html> < !--a padding to disable MSIE and

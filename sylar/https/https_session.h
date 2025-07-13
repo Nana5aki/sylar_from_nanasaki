@@ -4,26 +4,29 @@
  * @LastEditors: Nana5aki
  * @LastEditTime: 2025-07-12 18:00:57
  * @FilePath: /sylar_from_nanasaki/sylar/https/https_session.h
- * @Description: HTTPS会话头文件 - 基于SslSocketStream扩展HTTP协议支持
+ * @Description: HTTPS会话头文件 - 基于HttpSession扩展SSL/TLS支持
  *               提供HTTPS服务器端会话处理能力，支持加密HTTP通信
  */
 #pragma once
 
+#include "sylar/http/http_session.h"
 #include "sylar/streams/ssl_socket_stream.h"
 #include "sylar/http/http_request.h"
 #include "sylar/http/http_response.h"
 #include "sylar/socket.h"
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
 
 namespace sylar {
 namespace https {
 
 /**
  * @brief HTTPS会话封装类
- * @details 继承自SslSocketStream，在SSL套接字流基础上添加HTTP协议支持
- *          用于HTTPS服务器端处理客户端连接、接收HTTP请求和发送HTTP响应
+ * @details 继承自HttpSession，在HTTP会话基础上添加SSL/TLS加密支持
+ *          复用HttpSession的HTTP协议处理逻辑，专注于SSL层面的功能
  *          提供完整的HTTPS会话管理功能
  */
-class HttpsSession : public SslSocketStream {
+class HttpsSession : public sylar::http::HttpSession {
 public:
     using ptr = std::shared_ptr<HttpsSession>;
 
@@ -49,34 +52,33 @@ public:
 
   /**
    * @brief 析构函数
-   * @details 清理HTTPS会话相关资源，SSL对象和socket的清理由基类处理
+   * @details 清理HTTPS会话相关资源，包括SSL对象和socket的清理
    */
-  ~HttpsSession() = default;
+  ~HttpsSession();
 
       /**
-   * @brief 接收HTTP请求
-   * @return sylar::http::HttpRequest::ptr HTTP请求对象智能指针
-   *         nullptr表示接收失败或连接关闭
-   * @details 从SSL加密连接中接收HTTP请求数据并解析
-   *          内部处理SSL解密和HTTP协议解析
-   *          支持完整的HTTP/1.1协议特性，包括chunked传输等
-   *          会自动处理SSL层的读取错误和重试
+   * @brief 重写读取方法 - 使用SSL加密读取
+   * @param[out] buffer 接收缓冲区
+   * @param[in] length 缓冲区长度
+   * @return 实际读取的字节数
+   * @details 重写父类的read方法，通过SSL进行加密数据读取
    */
-  sylar::http::HttpRequest::ptr recvRequest();
+  virtual int read(void* buffer, size_t length) override;
 
   /**
-   * @brief 发送HTTP响应
-   * @param[in] rsp HTTP响应对象智能指针
-   * @return int 发送结果
-   *         >0 发送成功的字节数
-   *         =0 对方关闭连接
-   *         <0 Socket异常或SSL错误
-   * @details 将HTTP响应对象序列化并通过SSL连接发送
-   *          内部处理HTTP响应格式化和SSL加密传输
-   *          支持HTTP/1.1的各种响应格式和头部字段
-   *          会自动处理SSL层的写入错误和重试
+   * @brief 重写写入方法 - 使用SSL加密写入
+   * @param[in] buffer 发送缓冲区
+   * @param[in] length 发送数据长度
+   * @return 实际写入的字节数
+   * @details 重写父类的write方法，通过SSL进行加密数据写入
    */
-  int sendResponse(sylar::http::HttpResponse::ptr rsp);
+  virtual int write(const void* buffer, size_t length) override;
+
+  /**
+   * @brief 重写关闭方法 - 正确处理SSL连接关闭
+   * @details 重写父类的close方法，先关闭SSL连接，再关闭底层socket
+   */
+  virtual void close() override;
 
   /**
    * @brief 执行SSL握手
@@ -112,7 +114,7 @@ public:
    * @return X509* 客户端证书指针，如果客户端未提供证书则返回nullptr
    * @details 获取客户端在SSL握手过程中提供的证书
    *          只有在启用客户端证书验证时才会有返回值
-   *          返回的证书指针由SSL连接管理，无需手动释放
+   *          返回的证书指针需要调用者手动释放
    */
   X509* getClientCertificate() const;
 
@@ -159,9 +161,27 @@ public:
    */
   std::string getTLSVersion() const;
 
+  /**
+   * @brief 获取SSL对象
+   * @return SSL* SSL对象指针
+   * @details 返回当前会话使用的SSL对象
+   *          用于高级SSL操作和状态查询
+   */
+  SSL* getSSL() const { return m_ssl; }
+
+  /**
+   * @brief 检查SSL连接是否有效
+   * @return bool 连接是否有效
+   */
+  bool isSSLValid() const;
+
 private:
   /// SSL上下文 - 存储SSL配置信息，用于创建SSL对象和管理SSL参数
   SslContext::ptr m_ctx;
+  /// SSL连接对象 - OpenSSL的SSL连接对象
+  SSL* m_ssl;
+  /// 是否拥有SSL对象所有权 - 控制析构时是否释放SSL对象
+  bool m_owner_ssl;
   /// 是否已完成握手 - 标记SSL握手是否成功完成，控制HTTP通信的开始
   bool m_handshake_done;
 };

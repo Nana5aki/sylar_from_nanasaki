@@ -2,8 +2,8 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:02:57
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-29 22:53:49
- * @FilePath: /sylar_from_nanasaki/sylar/http/http_request.h
+ * @LastEditTime: 2025-07-13 14:37:31
+ * @FilePath: /sylar_from_nanasaki/sylar/http/core/http_request.h
  */
 #pragma once
 

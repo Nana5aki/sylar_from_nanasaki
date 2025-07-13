@@ -5,12 +5,12 @@
  * @LastEditTime: 2025-07-12 18:02:17
  * @FilePath: /sylar_from_nanasaki/sylar/https/https_session.cc
  * @Description: HTTPS会话实现文件 - 提供HTTPS服务器端会话处理功能
- *               基于SSL套接字流实现HTTP协议的加密传输
+ *               基于HttpSession实现SSL/TLS加密的HTTP协议传输
  */
 #include "https_session.h"
-#include "sylar/http/http_request_parser.h"
 #include "sylar/log.h"
 #include <openssl/x509.h>
+#include <openssl/err.h>
 #include <sstream>
 
 namespace sylar {
@@ -24,9 +24,14 @@ static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
  * @details 适用于已经创建好SSL对象的场景，通常用于服务器接受连接
  */
 HttpsSession::HttpsSession(Socket::ptr sock, SSL* ssl, bool owner)
-  : SslSocketStream(sock, ssl, owner)
+  : sylar::http::HttpSession(sock, owner)
+  , m_ssl(ssl)
+  , m_owner_ssl(true)
   , m_handshake_done(false) {
-  // 初始化握手完成标志为false，需要后续调用doHandshake()完成握手
+  // 如果SSL对象存在，将其与socket关联
+  if (m_ssl && sock) {
+    SSL_set_fd(m_ssl, sock->getSocket());
+  }
 }
 
 /**
@@ -34,76 +39,140 @@ HttpsSession::HttpsSession(Socket::ptr sock, SSL* ssl, bool owner)
  * @details 基于SSL上下文创建新的SSL对象，适用于动态创建SSL连接的场景
  */
 HttpsSession::HttpsSession(Socket::ptr sock, SslContext::ptr ctx, bool owner)
-  : SslSocketStream(sock, nullptr, owner)
+  : sylar::http::HttpSession(sock, owner)
   , m_ctx(ctx)
+  , m_ssl(nullptr)
+  , m_owner_ssl(true)
   , m_handshake_done(false) {
   if (m_ctx) {
     // 从SSL上下文创建新的SSL对象
     m_ssl = m_ctx->createSSL();
-    if (m_ssl) {
+    if (m_ssl && sock) {
       // 将SSL对象与socket文件描述符关联
       SSL_set_fd(m_ssl, sock->getSocket());
     }
   }
 }
 
-sylar::http::HttpRequest::ptr HttpsSession::recvRequest() {
-  // 如果还没有完成握手，先执行握手
-  if (!m_handshake_done) {
-    if (!doHandshake()) {
-      SYLAR_LOG_ERROR(g_logger) << "SSL handshake failed";
-      return nullptr;
-    }
+/**
+ * @brief 析构函数实现
+ * @details 清理SSL对象和相关资源
+ */
+HttpsSession::~HttpsSession() {
+  if (m_ssl && m_owner_ssl) {
+    // 执行SSL优雅关闭
+    SSL_shutdown(m_ssl);
+    SSL_free(m_ssl);
+    m_ssl = nullptr;
   }
-
-  sylar::http::HttpRequestParser::ptr parser = std::make_shared<sylar::http::HttpRequestParser>();
-  uint64_t buff_size = sylar::http::HttpRequestParser::GetHttpRequestBufferSize();
-  std::shared_ptr<char> buffer(new char[buff_size], [](char* ptr) { delete[] ptr; });
-  char* data = buffer.get();
-  int offset = 0;
-
-  do {
-    int len = read(data + offset, buff_size - offset);
-    if (len <= 0) {
-      SYLAR_LOG_ERROR(g_logger) << "HTTPS recv request failed, len=" << len;
-      close();
-      return nullptr;
-    }
-    len += offset;
-    size_t nparse = parser->execute(data, len);
-    if (parser->hasError()) {
-      SYLAR_LOG_ERROR(g_logger) << "HTTPS request parser error";
-      close();
-      return nullptr;
-    }
-    offset = len - nparse;
-    if (offset == (int)buff_size) {
-      SYLAR_LOG_ERROR(g_logger) << "HTTPS request buffer overflow";
-      close();
-      return nullptr;
-    }
-    if (parser->isFinished()) {
-      break;
-    }
-  } while (true);
-
-  return parser->getData();
 }
 
-int HttpsSession::sendResponse(sylar::http::HttpResponse::ptr rsp) {
-  if (!m_handshake_done) {
-    SYLAR_LOG_ERROR(g_logger) << "SSL handshake not completed";
+int HttpsSession::read(void* buffer, size_t length) {
+  if (!m_ssl) {
+    SYLAR_LOG_ERROR(g_logger) << "SSL not initialized";
     return -1;
   }
 
-  std::stringstream ss;
-  ss << *rsp;
-  std::string data = ss.str();
-  return writeFixSize(data.c_str(), data.size());
+  // 如果还没有完成握手，先执行握手
+  if (!m_handshake_done) {
+    if (!doHandshake()) {
+      SYLAR_LOG_ERROR(g_logger) << "SSL handshake failed during read";
+      return -1;
+    }
+  }
+
+  int ret = SSL_read(m_ssl, buffer, length);
+  if (ret <= 0) {
+    int ssl_error = SSL_get_error(m_ssl, ret);
+    switch (ssl_error) {
+      case SSL_ERROR_WANT_READ:
+      case SSL_ERROR_WANT_WRITE:
+        // 需要更多数据，稍后重试
+        errno = EAGAIN;
+        return -1;
+      case SSL_ERROR_ZERO_RETURN:
+        // SSL连接被优雅关闭
+        return 0;
+      case SSL_ERROR_SYSCALL:
+        // 系统调用错误
+        if (errno == 0) {
+          // 对端关闭连接
+          return 0;
+        }
+        SYLAR_LOG_ERROR(g_logger) << "SSL_read syscall error: " << strerror(errno);
+        return -1;
+      case SSL_ERROR_SSL:
+        // SSL协议错误
+        SYLAR_LOG_ERROR(g_logger) << "SSL_read protocol error: " << ERR_error_string(ERR_get_error(), nullptr);
+        return -1;
+      default:
+        SYLAR_LOG_ERROR(g_logger) << "SSL_read unknown error: " << ssl_error;
+        return -1;
+    }
+  }
+
+  return ret;
+}
+
+int HttpsSession::write(const void* buffer, size_t length) {
+  if (!m_ssl) {
+    SYLAR_LOG_ERROR(g_logger) << "SSL not initialized";
+    return -1;
+  }
+
+  // 如果还没有完成握手，先执行握手
+  if (!m_handshake_done) {
+    if (!doHandshake()) {
+      SYLAR_LOG_ERROR(g_logger) << "SSL handshake failed during write";
+      return -1;
+    }
+  }
+
+  int ret = SSL_write(m_ssl, buffer, length);
+  if (ret <= 0) {
+    int ssl_error = SSL_get_error(m_ssl, ret);
+    switch (ssl_error) {
+      case SSL_ERROR_WANT_READ:
+      case SSL_ERROR_WANT_WRITE:
+        // 需要更多数据，稍后重试
+        errno = EAGAIN;
+        return -1;
+      case SSL_ERROR_ZERO_RETURN:
+        // SSL连接被优雅关闭
+        return 0;
+      case SSL_ERROR_SYSCALL:
+        // 系统调用错误
+        if (errno == 0) {
+          // 对端关闭连接
+          return 0;
+        }
+        SYLAR_LOG_ERROR(g_logger) << "SSL_write syscall error: " << strerror(errno);
+        return -1;
+      case SSL_ERROR_SSL:
+        // SSL协议错误
+        SYLAR_LOG_ERROR(g_logger) << "SSL_write protocol error: " << ERR_error_string(ERR_get_error(), nullptr);
+        return -1;
+      default:
+        SYLAR_LOG_ERROR(g_logger) << "SSL_write unknown error: " << ssl_error;
+    return -1;
+  }
+  }
+
+  return ret;
+}
+
+void HttpsSession::close() {
+  if (m_ssl && m_owner_ssl) {
+    // 只有拥有SSL对象所有权时才执行SSL层的关闭
+    SSL_shutdown(m_ssl);
+  }
+  
+  // 调用父类方法关闭底层socket连接
+  sylar::http::HttpSession::close();
 }
 
 bool HttpsSession::doHandshake() {
-  if (!m_ssl || !isConnected()) {
+  if (!m_ssl || !getSocket() || !getSocket()->isConnected()) {
     SYLAR_LOG_ERROR(g_logger) << "Invalid SSL connection for handshake";
     return false;
   }
@@ -115,11 +184,32 @@ bool HttpsSession::doHandshake() {
   // 设置为服务端模式
   SSL_set_accept_state(m_ssl);
 
-  bool ret = SslSocketStream::doHandshake();
-  if (ret) {
+  int ret = SSL_accept(m_ssl);
+  if (ret == 1) {
+    // 握手成功
     m_handshake_done = true;
+    SYLAR_LOG_DEBUG(g_logger) << "SSL handshake completed successfully";
+    return true;
   }
-  return ret;
+
+  int ssl_error = SSL_get_error(m_ssl, ret);
+  switch (ssl_error) {
+    case SSL_ERROR_WANT_READ:
+    case SSL_ERROR_WANT_WRITE:
+      // 需要更多数据，稍后重试
+      SYLAR_LOG_DEBUG(g_logger) << "SSL handshake wants more data";
+      errno = EAGAIN;
+      return false;
+    case SSL_ERROR_SYSCALL:
+      SYLAR_LOG_ERROR(g_logger) << "SSL handshake syscall error: " << strerror(errno);
+      return false;
+    case SSL_ERROR_SSL:
+      SYLAR_LOG_ERROR(g_logger) << "SSL handshake protocol error: " << ERR_error_string(ERR_get_error(), nullptr);
+      return false;
+    default:
+      SYLAR_LOG_ERROR(g_logger) << "SSL handshake unknown error: " << ssl_error;
+      return false;
+  }
 }
 
 X509* HttpsSession::getClientCertificate() const {
@@ -130,7 +220,11 @@ X509* HttpsSession::getClientCertificate() const {
 }
 
 bool HttpsSession::verifyClientCertificate() const {
-  X509* cert = getClientCertificate();
+  if (!m_ssl) {
+    return false;
+  }
+
+  X509* cert = SSL_get_peer_certificate(m_ssl);
   if (!cert) {
     return false;   // 没有客户端证书
   }
@@ -184,6 +278,10 @@ std::string HttpsSession::getTLSVersion() const {
 
   const char* version = SSL_get_version(m_ssl);
   return version ? version : "Unknown";
+}
+
+bool HttpsSession::isSSLValid() const {
+  return m_ssl != nullptr && m_handshake_done;
 }
 
 }   // namespace https
