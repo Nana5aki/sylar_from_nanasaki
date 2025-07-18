@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-04-26 22:25:17
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-13 16:54:04
+ * @LastEditTime: 2025-07-18 22:41:19
  * @FilePath: /sylar_from_nanasaki/sylar/http/http_server.cc
  */
 #include "http_server.h"
@@ -31,7 +31,7 @@ void HttpServer::handleClient(Socket::ptr client) {
   SYLAR_LOG_DEBUG(g_logger) << "handleClient " << *client;
   
   // 创建新架构的HTTP会话
-  auto session = HttpSessionFactory::getInstance()->createSession(client);
+  auto session = HttpSessionFactory::getInstance()->createHttpSession(client);
   
   do {
     auto req = session->recvRequest();

@@ -2,15 +2,17 @@
  * @Author: Nana5aki
  * @Date: 2025-07-13 16:05:00
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-13 15:16:18
+ * @LastEditTime: 2025-07-18 23:01:15
  * @FilePath: /sylar_from_nanasaki/sylar/http/session/http_session_factory.cc
  */
 
 #include "http_session_factory.h"
-#include "http_session_impl.h"
 #include "../protocol/http11_protocol.h"
+#include "../transport/ssl_transport.h"
 #include "../transport/tcp_transport.h"
+#include "http_session_impl.h"
 #include "sylar/mutex.h"
+#include "sylar/streams/ssl_socket_stream.h"
 
 namespace sylar {
 namespace http {
@@ -28,58 +30,28 @@ HttpSessionFactory::ptr HttpSessionFactory::getInstance() {
   return s_instance;
 }
 
-IHttpSession::ptr HttpSessionFactory::createSession(Socket::ptr socket,
-                                                   const std::string& protocolVersion,
-                                                   const std::string& transportType) {
-  auto transport = createTransport(socket, transportType);
-  if (!transport) {
-    return nullptr;
-  }
-  
+IHttpSession::ptr HttpSessionFactory::createHttpSession(Socket::ptr socket,
+                                                        const HttpProtocolType& protocolVersion) {
+
   auto protocol = createProtocol(protocolVersion);
-  if (!protocol) {
-    return nullptr;
-  }
-  
-  return createSession(protocol, transport);
+  return std::make_shared<HttpSessionImpl>(protocol, std::make_shared<TcpTransport>(socket));
 }
 
-IHttpSession::ptr HttpSessionFactory::createSession(IHttpTransport::ptr transport,
-                                                   const std::string& protocolVersion) {
+IHttpSession::ptr HttpSessionFactory::createHttpsSession(Socket::ptr socket,
+                                                         SslContext::ptr ssl_context,
+                                                         const HttpProtocolType& protocolVersion) {
   auto protocol = createProtocol(protocolVersion);
-  if (!protocol) {
-    return nullptr;
-  }
-  
-  return createSession(protocol, transport);
+  return std::make_shared<HttpSessionImpl>(protocol,
+                                           std::make_shared<SslTransport>(socket, ssl_context));
 }
 
-IHttpSession::ptr HttpSessionFactory::createSession(IHttpProtocol::ptr protocol,
-                                                   IHttpTransport::ptr transport) {
-  if (!protocol || !transport) {
-    return nullptr;
-  }
-  
-  return std::make_shared<HttpSessionImpl>(protocol, transport);
-}
-
-IHttpProtocol::ptr HttpSessionFactory::createProtocol(const std::string& version) {
-  if (version == "1.1") {
+IHttpProtocol::ptr HttpSessionFactory::createProtocol(const HttpProtocolType& protocolVersion) {
+  if (protocolVersion == HttpProtocolType::HTTP1_1) {
     return std::make_shared<Http11Protocol>();
   }
-  
-  // TODO: 添加其他协议版本支持
+
   return nullptr;
 }
 
-IHttpTransport::ptr HttpSessionFactory::createTransport(Socket::ptr socket, const std::string& type) {
-  if (type == "tcp") {
-    return std::make_shared<TcpTransport>(socket);
-  }
-  
-  // TODO: 添加其他传输类型支持（SSL等）
-  return nullptr;
-}
-
-}  // namespace http
-}  // namespace sylar 
+}   // namespace http
+}   // namespace sylar
