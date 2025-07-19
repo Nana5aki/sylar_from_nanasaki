@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-25 22:53:59
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-25 00:26:15
+ * @LastEditTime: 2025-07-19 16:13:26
  * @FilePath: /sylar_from_nanasaki/sylar/log.cc
  */
 
@@ -14,7 +14,6 @@
 #include <functional>
 #include <map>
 #include <stdexcept>
-#include <string_view>
 
 namespace sylar {
 

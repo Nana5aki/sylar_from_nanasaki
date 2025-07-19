@@ -2,16 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2025-07-18 00:51:57
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-18 23:15:36
+ * @LastEditTime: 2025-07-19 17:33:17
  * @FilePath: /sylar_from_nanasaki/sylar/http/https_server.cc
  */
 
 #include "https_server.h"
-#include "protocol/http11_protocol.h"
 #include "session/http_session_factory.h"
-#include "session/http_session_impl.h"
 #include "sylar/log.h"
-#include "transport/ssl_transport.h"
 
 namespace sylar {
 namespace http {

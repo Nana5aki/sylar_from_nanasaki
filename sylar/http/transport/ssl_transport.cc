@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-07-16 01:13:06
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-16 23:52:10
+ * @LastEditTime: 2025-07-19 17:31:17
  * @FilePath: /sylar_from_nanasaki/sylar/http/transport/ssl_transport.cc
  */
 
@@ -131,7 +131,7 @@ bool SslTransport::doHandshake() {
     m_handshake_done = true;
     SYLAR_LOG_DEBUG(g_logger) << "SSL handshake completed successfully";
   } else {
-    SYLAR_LOG_DEBUG(g_logger) << "SSL handshake failed or needs more data";
+    SYLAR_LOG_ERROR(g_logger) << "SSL handshake failed or needs more data";
   }
 
   return result;

@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-07-06 16:36:46
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-13 00:14:43
+ * @LastEditTime: 2025-07-19 17:13:52
  * @FilePath: /sylar_from_nanasaki/sylar/streams/ssl_socket_stream.cc
  */
 
@@ -28,6 +28,8 @@ SslSocketStream::SslSocketStream(Socket::ptr sock, SSL* ssl, bool owner)
   // 这是SSL连接的必要步骤，让SSL对象知道要使用哪个socket进行通信
   if (m_ssl) {
     SSL_set_fd(m_ssl, sock->getSocket());
+    // 设置为服务端模式，这是HTTPS服务器必需的
+    SSL_set_accept_state(m_ssl);
   }
 }
 
@@ -241,6 +243,13 @@ bool SslSocketStream::doHandshake() {
   default:
     // 其他SSL协议错误，如证书验证失败、协议不匹配等
     SYLAR_LOG_ERROR(g_logger) << "SSL handshake error: " << error;
+    // 获取详细的SSL错误信息
+    unsigned long ssl_err = ERR_get_error();
+    if (ssl_err) {
+      char err_buf[256];
+      ERR_error_string_n(ssl_err, err_buf, sizeof(err_buf));
+      SYLAR_LOG_ERROR(g_logger) << "SSL error details: " << err_buf;
+    }
     return false;
   }
 }
@@ -262,10 +271,10 @@ bool SslSocketStream::isValid() const {
  * @details 创建并初始化SSL上下文，设置基本的安全选项
  */
 SslContext::SslContext(const SSL_METHOD* method) {
-  // 如果未指定SSL方法，使用默认的TLS_method
-  // TLS_method支持所有TLS版本，让客户端和服务端自动协商
+  // 如果未指定SSL方法，使用默认的TLS_server_method
+  // TLS_server_method专门用于服务器端，支持所有TLS版本
   if (!method) {
-    method = TLS_method();
+    method = TLS_server_method();
   }
 
   // 创建SSL上下文对象，这是所有SSL连接的配置基础
