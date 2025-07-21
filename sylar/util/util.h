@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <boost/lexical_cast.hpp>
+#include "lexical_cast.h"
 #include <cxxabi.h>
 #include <stdint.h>
 #include <string>
@@ -103,7 +103,7 @@ V GetParamValue(const Map& m, const K& k, const V& def = V()) {
     return def;
   }
   try {
-    return boost::lexical_cast<V>(it->second);
+    return sylar::util::lexical_cast<V>(it->second);
   } catch (...) {}
   return def;
 }
@@ -115,7 +115,7 @@ bool CheckGetParamValue(const Map& m, const K& k, V& v) {
     return false;
   }
   try {
-    v = boost::lexical_cast<V>(it->second);
+    v = sylar::util::lexical_cast<V>(it->second);
     return true;
   } catch (...) {}
   return false;

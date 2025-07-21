@@ -11,6 +11,8 @@
 #include <fcntl.h>       // for fcntl()
 #include <sys/epoll.h>   // for epoll_xxx()
 #include <unistd.h>      // for pipe()
+#include <cstring>
+#include <string>
 
 namespace sylar {
 

@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2024-11-30 16:26:01
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-31 11:53:53
+ * @LastEditTime: 2025-07-20 17:50:52
  * @FilePath: /sylar_from_nanasaki/sylar/config.h
  */
 #ifndef __SYLAR_CONFIG_H__
@@ -11,7 +11,7 @@
 #include "log.h"
 #include "mutex.h"
 #include "util/util.h"
-#include <boost/lexical_cast.hpp>
+#include "util/lexical_cast.h"
 #include <unordered_set>
 #include <yaml-cpp/yaml.h>
 #include <functional>
@@ -91,7 +91,7 @@ public:
    * @exception 当类型不可转换时抛出异常
    */
   T operator()(const F& v) {
-    return boost::lexical_cast<T>(v);
+    return sylar::util::lexical_cast<T>(v);
   }
 };
 
@@ -343,7 +343,6 @@ public:
    */
   std::string toString() override {
     try {
-      // return boost::lexical_cast<std::string>(m_val);
       RWMutexType::ReadLock lock(m_mutex);
       return ToStr()(m_val);
     } catch (std::exception& e) {

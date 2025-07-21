@@ -8,7 +8,7 @@
 #pragma once
 
 #include "http_parser.h"
-#include <boost/lexical_cast.hpp>
+#include "sylar/util/lexical_cast.h"
 #include <string>
 
 namespace sylar {
@@ -90,7 +90,7 @@ bool checkGetAs(const MapType& m, const std::string& key, T& val, const T& def =
     return false;
   }
   try {
-    val = boost::lexical_cast<T>(it->second);
+    val = sylar::util::lexical_cast<T>(it->second);
     return true;
   } catch (...) {
     val = def;
@@ -112,7 +112,7 @@ T getAs(const MapType& m, const std::string& key, const T& def = T()) {
     return def;
   }
   try {
-    return boost::lexical_cast<T>(it->second);
+    return sylar::util::lexical_cast<T>(it->second);
   } catch (...) {}
   return def;
 }

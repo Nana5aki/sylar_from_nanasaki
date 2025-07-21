@@ -2,10 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2025-04-18 23:38:04
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-19 00:02:05
- * @FilePath: /sylar_from_nanasaki/sylar/http/http_utils.cc
+ * @LastEditTime: 2025-07-20 18:08:11
+ * @FilePath: /sylar_from_nanasaki/sylar/http/core/http_utils.cc
  */
 #include "http_utils.h"
+#include <cstring>
+#include <cstdlib>
+#include <string>
 
 namespace sylar {
 namespace http {

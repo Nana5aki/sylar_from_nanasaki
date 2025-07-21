@@ -16,6 +16,13 @@
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
+#include <cxxabi.h>
+#include <execinfo.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vector>
 
 namespace sylar {
 namespace util {

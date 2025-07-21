@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-05-24 18:25:07
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-07-19 19:27:15
+ * @LastEditTime: 2025-07-20 17:51:31
  * @FilePath: /sylar_from_nanasaki/readme.md
 -->
 # sylar_from_nanasaki
@@ -17,4 +17,4 @@
 - [ ] http 2.0
 - [ ] http 3.0
 - [ ] CMake拆分
-- [ ] 去除boost库依赖
+- [x] 去除boost库依赖

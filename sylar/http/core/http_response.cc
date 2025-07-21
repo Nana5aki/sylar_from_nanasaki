@@ -2,11 +2,13 @@
  * @Author: Nana5aki
  * @Date: 2025-04-19 00:04:58
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-18 18:07:44
- * @FilePath: /sylar_from_nanasaki/sylar/http/http_response.cc
+ * @LastEditTime: 2025-07-20 17:56:38
+ * @FilePath: /sylar_from_nanasaki/sylar/http/core/http_response.cc
  */
 #include "http_response.h"
 #include "sylar/util/util.h"
+#include <cstring>
+#include <sstream>
 
 namespace sylar {
 namespace http {

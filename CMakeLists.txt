@@ -60,11 +60,6 @@ file(GLOB LIB_SRC
     "third_party/http-parser/*.c"
 )
 
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 find_package(SQLite3 REQUIRED)
 if(SQLite3_FOUND)
     include_directories(${SQLite3_INCLUDE_DIRS})
