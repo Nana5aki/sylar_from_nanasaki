@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-27 08:42:33
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-04-04 10:46:11
+ * @LastEditTime: 2025-07-26 15:54:44
  * @FilePath: /sylar_from_nanasaki/tests/test_hook.cpp
  */
 
@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 
 static sylar::Logger::ptr g_logger = SYLAR_LOG_ROOT();
 

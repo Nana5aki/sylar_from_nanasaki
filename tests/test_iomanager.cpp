@@ -2,7 +2,7 @@
  * @Author: Nana5aki
  * @Date: 2025-03-02 18:16:55
  * @LastEditors: Nana5aki
- * @LastEditTime: 2025-05-01 22:38:49
+ * @LastEditTime: 2025-07-26 15:55:10
  * @FilePath: /sylar_from_nanasaki/tests/test_iomanager.cpp
  */
 #include "sylar/config.h"
@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <cstring>
 #include <unistd.h>
 
 sylar::Logger::ptr g_logger = SYLAR_LOG_ROOT();

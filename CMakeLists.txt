@@ -11,16 +11,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include(cmake/utils.cmake)
-
-# set(CMAKE_VERBOSE_MAKEFILE ON)
-
 set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Disable JsonCpp test compilation" FORCE)
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Disable JsonCpp post-build tests" FORCE)
 
-add_subdirectory(third_party/yaml-cpp)
-add_subdirectory(third_party/tinyxml2)
-add_subdirectory(third_party/jsoncpp)
+include(cmake/utils.cmake)
+include(cmake/third_party.cmake)
+
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# add_subdirectory(third_party/yaml-cpp)
+# add_subdirectory(third_party/tinyxml2)
+# add_subdirectory(third_party/jsoncpp)
 
 # -O0：关闭所有优化
 # -ggdb：启用调试信息的生成
@@ -40,9 +41,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-builtin-macro-
 set(RDYNAMIC_FLAG "-rdynamic")
 
 include_directories(.)
-include_directories(${CMAKE_SOURCE_DIR}/third_party/yaml-cpp/include)
-include_directories(${CMAKE_SOURCE_DIR}/third_party/tinyxml2)
-include_directories(${CMAKE_SOURCE_DIR}/third_party/jsoncpp/include)
+# include_directories(${CMAKE_SOURCE_DIR}/third_party/yaml-cpp/include)
+# include_directories(${CMAKE_SOURCE_DIR}/third_party/tinyxml2)
+# include_directories(${CMAKE_SOURCE_DIR}/third_party/jsoncpp/include)
 include_directories(${CMAKE_SOURCE_DIR}/third_party/http-parser)
 
 # 自动搜索所有源文件和头文件
